@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.student.mapper.SysUserMapper">
+
+    <!-- 用户视图对象结果映射 -->
+    <resultMap id="SysUserVOResultMap" type="com.example.student.vo.SysUserVO">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="name" column="name"/>
+        <result property="avatar" column="avatar"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="status" column="status"/>
+        <result property="statusDesc" column="status_desc"/>
+        <result property="userType" column="user_type"/>
+        <result property="userTypeDesc" column="user_type_desc"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <collection property="roleIds" ofType="java.lang.Long" javaType="java.util.ArrayList" column="id" select="selectRoleIdsByUserId"/>
+        <collection property="roleNames" ofType="java.lang.String" javaType="java.util.ArrayList" column="id" select="selectRoleNamesByUserId"/>
+    </resultMap>
+
+    <!-- 根据用户ID查询权限集合 -->
+    <select id="selectPermsByUserId" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT DISTINCT m.perms
+        FROM sys_menu m
+                 LEFT JOIN sys_role_menu rm ON m.id = rm.menu_id
+                 LEFT JOIN sys_user_role ur ON rm.role_id = ur.role_id
+                 LEFT JOIN sys_role r ON r.id = ur.role_id
+        WHERE ur.user_id = #{userId}
+          AND m.status = 0
+          AND r.status = 0
+          AND m.perms IS NOT NULL
+          AND m.perms != ''
+    </select>
+
+    <!-- 根据用户ID查询角色集合 -->
+    <select id="selectRoleKeysByUserId" parameterType="java.lang.Long" resultType="java.lang.String">
+        SELECT DISTINCT r.role_key
+        FROM sys_role r
+                 LEFT JOIN sys_user_role ur ON ur.role_id = r.id
+        WHERE ur.user_id = #{userId}
+          AND r.status = 0
+    </select>
+
+    <!-- 根据用户名查询用户 -->
+    <select id="selectUserByUsername" parameterType="java.lang.String" resultType="com.example.student.entity.SysUser">
+        SELECT *
+        FROM sys_user
+        WHERE username = #{username}
+          AND status = 0
+    </select>
+    
+    <!-- 查询用户列表 -->
+    <select id="selectUserList" resultMap="SysUserVOResultMap">
+        SELECT
+            u.id,
+            u.username,
+            u.name,
+            u.avatar,
+            u.email,
+            u.phone,
+            u.status,
+            CASE u.status WHEN 0 THEN '正常' WHEN 1 THEN '禁用' END AS status_desc,
+            u.user_type,
+            CASE u.user_type 
+                WHEN 0 THEN '管理员' 
+                WHEN 1 THEN '教师' 
+                WHEN 2 THEN '学生' 
+            END AS user_type_desc,
+            u.create_time,
+            u.update_time
+        FROM
+            sys_user u
+        <where>
+            <if test="username != null and username != ''">
+                AND u.username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="name != null and name != ''">
+                AND u.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND u.phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="status != null">
+                AND u.status = #{status}
+            </if>
+            <if test="userType != null">
+                AND u.user_type = #{userType}
+            </if>
+        </where>
+        ORDER BY u.id
+    </select>
+    
+    <!-- 根据用户ID查询用户 -->
+    <select id="selectUserById" resultMap="SysUserVOResultMap">
+        SELECT
+            u.id,
+            u.username,
+            u.name,
+            u.avatar,
+            u.email,
+            u.phone,
+            u.status,
+            CASE u.status WHEN 0 THEN '正常' WHEN 1 THEN '禁用' END AS status_desc,
+            u.user_type,
+            CASE u.user_type 
+                WHEN 0 THEN '管理员' 
+                WHEN 1 THEN '教师' 
+                WHEN 2 THEN '学生' 
+            END AS user_type_desc,
+            u.create_time,
+            u.update_time
+        FROM
+            sys_user u
+        WHERE
+            u.id = #{userId}
+    </select>
+    
+    <!-- 根据用户ID查询角色ID列表 -->
+    <select id="selectRoleIdsByUserId" resultType="java.lang.Long">
+        SELECT role_id
+        FROM sys_user_role
+        WHERE user_id = #{userId}
+    </select>
+    
+    <!-- 根据用户ID查询角色名称列表 -->
+    <select id="selectRoleNamesByUserId" resultType="java.lang.String">
+        SELECT r.role_name
+        FROM sys_role r
+        JOIN sys_user_role ur ON r.id = ur.role_id
+        WHERE ur.user_id = #{userId}
+    </select>
+</mapper> 

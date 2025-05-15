@@ -1,0 +1,1 @@
+import{s as t}from"./index-22381d63.js";function e(e){return t({url:"/attendance/statistics",method:"post",data:e})}function a(e,a){return t({url:`/student/${e}/attendance`,method:"get",params:a})}function n(e){return t({url:"/attendance/export",method:"post",data:e,responseType:"blob"})}export{e as a,n as e,a as g};

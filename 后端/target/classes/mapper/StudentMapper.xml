@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.student.mapper.StudentMapper">
+
+    <!-- 分页查询学生信息 -->
+    <select id="selectStudentPage" resultType="com.example.student.vo.StudentVO">
+        SELECT
+            s.id,
+            s.student_no,
+            u.name,
+            s.class_id,
+            c.name AS class_name,
+            c.major_id,
+            m.name AS major_name,
+            m.department_id,
+            d.name AS department_name,
+            s.admission_date,
+            s.graduation_date,
+            s.gender,
+            CASE s.gender WHEN 0 THEN '男' WHEN 1 THEN '女' ELSE '未知' END AS gender_desc,
+            s.id_card,
+            s.birthday,
+            s.address,
+            s.status,
+            CASE s.status
+                WHEN 0 THEN '在读'
+                WHEN 1 THEN '毕业'
+                WHEN 2 THEN '休学'
+                WHEN 3 THEN '退学'
+                ELSE '未知'
+            END AS status_desc,
+            u.email,
+            u.phone,
+            s.create_time
+        FROM
+            student s
+            LEFT JOIN sys_user u ON s.user_id = u.id
+            LEFT JOIN class c ON s.class_id = c.id
+            LEFT JOIN major m ON c.major_id = m.id
+            LEFT JOIN department d ON m.department_id = d.id
+        WHERE
+            1 = 1
+            <if test="studentNo != null and studentNo != ''">
+                AND s.student_no LIKE CONCAT('%', #{studentNo}, '%')
+            </if>
+            <if test="name != null and name != ''">
+                AND u.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="classId != null">
+                AND s.class_id = #{classId}
+            </if>
+            <if test="gender != null">
+                AND s.gender = #{gender}
+            </if>
+            <if test="majorId != null">
+                AND c.major_id = #{majorId}
+            </if>
+            <if test="departmentId != null">
+                AND m.department_id = #{departmentId}
+            </if>
+            <if test="phone != null and phone != ''">
+                AND u.phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="status != null">
+                AND s.status = #{status}
+            </if>
+            <if test="startDate != null and startDate != ''">
+                AND s.admission_date >= #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+                AND s.admission_date &lt;= #{endDate}
+            </if>
+        ORDER BY
+            s.id DESC
+    </select>
+
+    <!-- 根据ID查询学生信息 -->
+    <select id="selectStudentById" resultType="com.example.student.vo.StudentVO">
+        SELECT
+            s.id,
+            s.student_no,
+            u.name,
+            s.class_id,
+            c.name AS class_name,
+            c.major_id,
+            m.name AS major_name,
+            m.department_id,
+            d.name AS department_name,
+            s.admission_date,
+            s.graduation_date,
+            s.gender,
+            CASE s.gender WHEN 0 THEN '男' WHEN 1 THEN '女' ELSE '未知' END AS gender_desc,
+            s.id_card,
+            s.birthday,
+            s.address,
+            s.status,
+            CASE s.status
+                WHEN 0 THEN '在读'
+                WHEN 1 THEN '毕业'
+                WHEN 2 THEN '休学'
+                WHEN 3 THEN '退学'
+                ELSE '未知'
+            END AS status_desc,
+            u.email,
+            u.phone,
+            s.create_time
+        FROM
+            student s
+            LEFT JOIN sys_user u ON s.user_id = u.id
+            LEFT JOIN class c ON s.class_id = c.id
+            LEFT JOIN major m ON c.major_id = m.id
+            LEFT JOIN department d ON m.department_id = d.id
+        WHERE
+            s.id = #{id}
+    </select>
+    
+    <!-- 查询学生课程列表 -->
+    <select id="selectStudentCoursePage" resultType="com.example.student.vo.StudentCourseVO">
+        SELECT
+            cs.id,
+            c.id AS course_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit,
+            c.hours,
+            c.type AS course_type,
+            co.id AS course_offering_id,
+            co.teacher_id,
+            t_user.name AS teacher_name,
+            co.semester,
+            co.class_time,
+            co.location,
+            cs.selection_time,
+            cs.score,
+            cs.status
+        FROM
+            course_selection cs
+            JOIN course_offering co ON cs.course_offering_id = co.id
+            JOIN course c ON co.course_id = c.id
+            JOIN teacher t ON co.teacher_id = t.id
+            JOIN sys_user t_user ON t.user_id = t_user.id
+        WHERE
+            cs.student_id = #{studentId}
+            <if test="status != null">
+                AND cs.status = #{status}
+            </if>
+        ORDER BY
+            co.semester DESC, c.id
+    </select>
+    
+    <!-- 查询学生成绩列表 -->
+    <select id="selectStudentGradePage" resultType="com.example.student.vo.StudentGradeVO">
+        SELECT
+            cs.id,
+            c.id AS course_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit,
+            c.hours,
+            c.type AS course_type,
+            t_user.name AS teacher_name,
+            co.semester,
+            cs.score
+        FROM
+            course_selection cs
+            JOIN course_offering co ON cs.course_offering_id = co.id
+            JOIN course c ON co.course_id = c.id
+            JOIN teacher t ON co.teacher_id = t.id
+            JOIN sys_user t_user ON t.user_id = t_user.id
+        WHERE
+            cs.student_id = #{studentId}
+            AND cs.score IS NOT NULL
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+        ORDER BY
+            co.semester DESC, c.id
+    </select>
+    
+    <!-- 查询学生考勤记录 -->
+    <select id="selectStudentAttendancePage" resultType="com.example.student.vo.StudentAttendanceVO">
+        SELECT
+            a.id,
+            a.course_offering_id,
+            co.course_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            t_user.name AS teacher_name,
+            co.semester,
+            a.attendance_date,
+            a.status,
+            a.remark,
+            a.create_time
+        FROM
+            attendance a
+            JOIN course_offering co ON a.course_offering_id = co.id
+            JOIN course c ON co.course_id = c.id
+            JOIN teacher t ON co.teacher_id = t.id
+            JOIN sys_user t_user ON t.user_id = t_user.id
+        WHERE
+            a.student_id = #{studentId}
+            <if test="startDate != null">
+                AND a.attendance_date >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND a.attendance_date &lt;= #{endDate}
+            </if>
+            <if test="status != null">
+                AND a.status = #{status}
+            </if>
+        ORDER BY
+            a.attendance_date DESC, co.id
+    </select>
+    
+    <!-- 根据学号查询学生信息 -->
+    <select id="selectByStudentNo" resultType="com.example.student.entity.Student">
+        SELECT * FROM student WHERE student_no = #{studentNo}
+    </select>
+    
+    <!-- 根据身份证号查询学生信息 -->
+    <select id="selectByIdCard" resultType="com.example.student.entity.Student">
+        SELECT * FROM student WHERE id_card = #{idCard}
+    </select>
+    
+    <!-- 根据用户ID查询学生课程分页 -->
+    <select id="selectUserCourses" resultType="com.example.student.vo.StudentCourseVO">
+        SELECT
+            cs.id,
+            c.id AS course_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit,
+            c.hours,
+            c.type AS course_type,
+            co.id AS course_offering_id,
+            co.teacher_id,
+            t_user.name AS teacher_name,
+            co.semester,
+            co.class_time,
+            co.location,
+            cs.selection_time,
+            cs.score,
+            cs.status
+        FROM
+            course_selection cs
+            JOIN student s ON cs.student_id = s.id
+            JOIN course_offering co ON cs.course_offering_id = co.id
+            JOIN course c ON co.course_id = c.id
+            JOIN teacher t ON co.teacher_id = t.id
+            JOIN sys_user t_user ON t.user_id = t_user.id
+        WHERE
+            s.user_id = #{userId}
+            <if test="courseName != null and courseName != ''">
+                AND c.name LIKE CONCAT('%', #{courseName}, '%')
+            </if>
+            <if test="courseCode != null and courseCode != ''">
+                AND c.code LIKE CONCAT('%', #{courseCode}, '%')
+            </if>
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+        ORDER BY
+            co.semester DESC, c.id
+    </select>
+</mapper> 

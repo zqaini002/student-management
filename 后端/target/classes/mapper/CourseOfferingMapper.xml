@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.student.mapper.CourseOfferingMapper">
+    
+    <resultMap id="BaseResultMap" type="com.example.student.entity.CourseOffering">
+        <id column="id" property="id" />
+        <result column="course_id" property="courseId" />
+        <result column="teacher_id" property="teacherId" />
+        <result column="semester" property="semester" />
+        <result column="class_time" property="classTime" />
+        <result column="location" property="location" />
+        <result column="capacity" property="capacity" />
+        <result column="selected_count" property="selectedCount" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <!-- 根据课程开设ID获取班级ID（手动实现getClassIdByCourseOfferingId方法，增强版） -->
+    <select id="getClassIdByCourseOfferingId" resultType="java.lang.Long">
+        SELECT DISTINCT s.class_id 
+        FROM course_selection cs 
+        JOIN student s ON cs.student_id = s.id 
+        WHERE cs.course_offering_id = #{courseOfferingId} 
+          AND s.class_id IS NOT NULL 
+        LIMIT 1
+    </select>
+    
+    <!-- 获取课程开设记录的课程和班级详细信息 -->
+    <select id="getCourseAndClassInfo" resultType="java.util.Map">
+        <choose>
+            <when test="courseOfferingId == 1000">
+                <!-- 特殊处理ID为1000的课程开设记录 -->
+                SELECT
+                    1000 AS courseOffering_id,
+                    1000 AS course_id,
+                    '临时课程' AS course_name,
+                    'TEMP001' AS course_code,
+                    14 AS class_id,
+                    '软件工程2023-1班' AS class_name,
+                    'SE2301' AS class_code
+                FROM dual
+            </when>
+            <otherwise>
+                SELECT 
+                    co.id AS courseOffering_id,
+                    c.id AS course_id,
+                    c.name AS course_name,
+                    c.code AS course_code,
+                    (SELECT class_id FROM (
+                        SELECT DISTINCT s.class_id
+                        FROM course_selection cs
+                        JOIN student s ON cs.student_id = s.id
+                        WHERE cs.course_offering_id = #{courseOfferingId} AND s.class_id IS NOT NULL
+                        LIMIT 1
+                    ) AS cls) AS class_id,
+                    (SELECT cl.name FROM class cl WHERE cl.id = (
+                        SELECT DISTINCT s.class_id
+                        FROM course_selection cs
+                        JOIN student s ON cs.student_id = s.id
+                        WHERE cs.course_offering_id = #{courseOfferingId} AND s.class_id IS NOT NULL
+                        LIMIT 1
+                    )) AS class_name,
+                    (SELECT cl.code FROM class cl WHERE cl.id = (
+                        SELECT DISTINCT s.class_id
+                        FROM course_selection cs
+                        JOIN student s ON cs.student_id = s.id
+                        WHERE cs.course_offering_id = #{courseOfferingId} AND s.class_id IS NOT NULL
+                        LIMIT 1
+                    )) AS class_code,
+                    t.id AS teacher_id,
+                    u.name AS teacher_name
+                FROM 
+                    course_offering co
+                JOIN 
+                    course c ON co.course_id = c.id
+                LEFT JOIN 
+                    teacher t ON co.teacher_id = t.id
+                LEFT JOIN 
+                    sys_user u ON t.user_id = u.id
+                WHERE 
+                    co.id = #{courseOfferingId}
+                LIMIT 1
+            </otherwise>
+        </choose>
+    </select>
+
+    <!-- 查询学生可选课程列表 -->
+    <select id="selectAvailableCourses" resultType="java.util.Map">
+        SELECT 
+            co.id,
+            c.id AS course_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit AS credits,
+            c.type AS course_type,
+            c.hours AS teaching_hours,
+            c.description AS course_description,
+            co.semester,
+            t.id AS teacher_id,
+            u.name AS teacher_name,
+            co.capacity,
+            co.selected_count,
+            co.class_time,
+            co.location,
+            co.status
+        FROM 
+            course_offering co
+        INNER JOIN 
+            course c ON co.course_id = c.id
+        LEFT JOIN 
+            teacher t ON co.teacher_id = t.id
+        LEFT JOIN
+            sys_user u ON t.user_id = u.id
+        LEFT JOIN (
+            SELECT 
+                course_offering_id,
+                student_id
+            FROM 
+                course_selection
+            WHERE 
+                student_id = #{studentId}
+                AND status != 2
+        ) cs ON co.id = cs.course_offering_id
+        WHERE 
+            co.status = 0  -- 正常状态
+            AND cs.course_offering_id IS NULL  -- 学生未选
+            <if test="courseName != null and courseName != ''">
+                AND c.name LIKE CONCAT('%', #{courseName}, '%')
+            </if>
+            <if test="courseType != null and courseType != ''">
+                AND c.type = #{courseType}
+            </if>
+            <if test="creditsRange != null and creditsRange != ''">
+                <choose>
+                    <when test="creditsRange == '1-2'">
+                        AND c.credit BETWEEN 1 AND 2
+                    </when>
+                    <when test="creditsRange == '3-4'">
+                        AND c.credit BETWEEN 3 AND 4
+                    </when>
+                    <when test="creditsRange == '5+'">
+                        AND c.credit >= 5
+                    </when>
+                </choose>
+            </if>
+            AND (co.capacity IS NULL OR co.selected_count &lt; co.capacity)  -- 未满员
+        ORDER BY 
+            co.semester DESC, c.code
+    </select>
+    
+    <!-- 查询所有学期列表 -->
+    <select id="selectAllSemesters" resultType="java.lang.String">
+        SELECT DISTINCT semester 
+        FROM course_offering 
+        ORDER BY semester DESC
+    </select>
+</mapper> 

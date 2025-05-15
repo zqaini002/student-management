@@ -1,0 +1,91 @@
+// 全局过渡动画
+
+// 页面切换淡入淡出效果
+.fade-page-enter-active,
+.fade-page-leave-active {
+  transition: all 0.3s;
+}
+
+.fade-page-enter-from {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.fade-page-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+// 侧边栏展开收起动画
+.sidebar-expand-transition {
+  transition: margin-left 0.28s;
+}
+
+// 侧边栏菜单项展开动画
+.el-menu-transition {
+  overflow: hidden;
+  transition: height 0.3s ease-in-out;
+}
+
+// 弹出动画
+.popup-fade-enter-active,
+.popup-fade-leave-active {
+  transition: opacity 0.2s ease-in-out;
+}
+
+.popup-fade-enter-from,
+.popup-fade-leave-to {
+  opacity: 0;
+}
+
+// 缩放动画
+.zoom-in-center-enter-active,
+.zoom-in-center-leave-active {
+  transition: all 0.3s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+.zoom-in-center-enter-from,
+.zoom-in-center-leave-to {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+// 列表项动画
+.list-item-enter-active,
+.list-item-leave-active {
+  transition: all 0.3s;
+}
+
+.list-item-enter-from,
+.list-item-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+// 列表动画
+.list-transition-group-move {
+  transition: transform 0.3s;
+}
+
+.list-transition-group-enter-active,
+.list-transition-group-leave-active {
+  transition: all 0.3s;
+}
+
+.list-transition-group-enter-from,
+.list-transition-group-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+// 卡片动画
+.card-fade-enter-active,
+.card-fade-leave-active {
+  transition: all 0.3s;
+}
+
+.card-fade-enter-from,
+.card-fade-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+} 

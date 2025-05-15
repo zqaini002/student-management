@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.student.mapper.CourseSelectionMapper">
+
+    <!-- 选课管理视图对象结果映射 -->
+    <resultMap id="CourseSelectionManageVOResultMap" type="com.example.student.vo.CourseSelectionManageVO">
+        <id property="id" column="id"/>
+        <result property="studentNo" column="student_no"/>
+        <result property="studentName" column="student_name"/>
+        <result property="className" column="class_name"/>
+        <result property="courseCode" column="course_code"/>
+        <result property="courseName" column="course_name"/>
+        <result property="teacherName" column="teacher_name"/>
+        <result property="semester" column="semester"/>
+        <result property="selectionTime" column="selection_time"/>
+        <result property="score" column="score"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <!-- 查询选课分页列表 -->
+    <select id="selectSelectionPage" resultType="com.example.student.vo.CourseSelectionManageVO">
+        SELECT 
+            cs.id,
+            cs.student_id,
+            s.student_no,
+            u.name AS student_name,
+            s.class_id,
+            cl.name AS class_name,
+            cs.course_offering_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit AS credits,
+            c.type AS course_type,
+            co.semester,
+            co.teacher_id,
+            tu.name AS teacher_name,
+            cs.status,
+            CASE 
+                WHEN cs.status = 0 THEN '已选'
+                WHEN cs.status = 1 THEN '已退'
+                WHEN cs.status = 2 THEN '已修完'
+                ELSE '未知'
+            END AS statusDesc,
+            cs.score,
+            cs.selection_time,
+            cs.create_time,
+            cs.update_time
+        FROM 
+            course_selection cs
+        INNER JOIN 
+            student s ON cs.student_id = s.id
+        INNER JOIN 
+            sys_user u ON s.user_id = u.id
+        LEFT JOIN
+            class cl ON s.class_id = cl.id
+        INNER JOIN 
+            course_offering co ON cs.course_offering_id = co.id
+        INNER JOIN 
+            course c ON co.course_id = c.id
+        LEFT JOIN
+            teacher t ON co.teacher_id = t.id
+        LEFT JOIN
+            sys_user tu ON t.user_id = tu.id
+        <where>
+            <if test="query.studentNo != null and query.studentNo != ''">
+                AND s.student_no LIKE CONCAT('%', #{query.studentNo}, '%')
+            </if>
+            <if test="query.studentName != null and query.studentName != ''">
+                AND u.name LIKE CONCAT('%', #{query.studentName}, '%')
+            </if>
+            <if test="query.courseName != null and query.courseName != ''">
+                AND c.name LIKE CONCAT('%', #{query.courseName}, '%')
+            </if>
+            <if test="query.semester != null and query.semester != ''">
+                AND co.semester = #{query.semester}
+            </if>
+            <if test="query.status != null">
+                AND cs.status = #{query.status}
+            </if>
+        </where>
+        ORDER BY cs.update_time DESC
+    </select>
+
+    <!-- 查询选课列表（不分页） -->
+    <select id="selectSelectionList" resultType="com.example.student.vo.CourseSelectionManageVO">
+        SELECT
+            cs.id,
+            cs.student_id,
+            s.student_no,
+            u.name AS student_name,
+            s.class_id,
+            cl.name AS class_name,
+            cs.course_offering_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit AS credits,
+            c.type AS course_type,
+            co.semester,
+            co.teacher_id,
+            tu.name AS teacher_name,
+            cs.status,
+            CASE 
+                WHEN cs.status = 0 THEN '已选'
+                WHEN cs.status = 1 THEN '已退'
+                WHEN cs.status = 2 THEN '已修完'
+                ELSE '未知'
+            END AS statusDesc,
+            cs.score,
+            cs.selection_time,
+            cs.create_time,
+            cs.update_time
+        FROM
+            course_selection cs
+        INNER JOIN 
+            student s ON cs.student_id = s.id
+        INNER JOIN 
+            sys_user u ON s.user_id = u.id
+        LEFT JOIN
+            class cl ON s.class_id = cl.id
+        INNER JOIN 
+            course_offering co ON cs.course_offering_id = co.id
+        INNER JOIN 
+            course c ON co.course_id = c.id
+        LEFT JOIN
+            teacher t ON co.teacher_id = t.id
+        LEFT JOIN
+            sys_user tu ON t.user_id = tu.id
+        <where>
+            <if test="query.studentNo != null and query.studentNo != ''">
+                AND s.student_no LIKE CONCAT('%', #{query.studentNo}, '%')
+            </if>
+            <if test="query.studentName != null and query.studentName != ''">
+                AND u.name LIKE CONCAT('%', #{query.studentName}, '%')
+            </if>
+            <if test="query.courseName != null and query.courseName != ''">
+                AND c.name LIKE CONCAT('%', #{query.courseName}, '%')
+            </if>
+            <if test="query.semester != null and query.semester != ''">
+                AND co.semester = #{query.semester}
+            </if>
+            <if test="query.status != null">
+                AND cs.status = #{query.status}
+            </if>
+        </where>
+        ORDER BY cs.update_time DESC
+    </select>
+
+    <!-- 查询选课详情 -->
+    <select id="selectSelectionById" resultType="com.example.student.vo.CourseSelectionManageVO">
+        SELECT
+            cs.id,
+            cs.student_id,
+            s.student_no,
+            u.name AS student_name,
+            s.class_id,
+            cl.name AS class_name,
+            cs.course_offering_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit AS credits,
+            c.type AS course_type,
+            co.semester,
+            co.teacher_id,
+            tu.name AS teacher_name,
+            cs.status,
+            CASE 
+                WHEN cs.status = 0 THEN '已选'
+                WHEN cs.status = 1 THEN '已退'
+                WHEN cs.status = 2 THEN '已修完'
+                ELSE '未知'
+            END AS statusDesc,
+            cs.score,
+            cs.selection_time,
+            cs.create_time,
+            cs.update_time
+        FROM
+            course_selection cs
+        INNER JOIN 
+            student s ON cs.student_id = s.id
+        INNER JOIN 
+            sys_user u ON s.user_id = u.id
+        LEFT JOIN
+            class cl ON s.class_id = cl.id
+        INNER JOIN 
+            course_offering co ON cs.course_offering_id = co.id
+        INNER JOIN 
+            course c ON co.course_id = c.id
+        LEFT JOIN
+            teacher t ON co.teacher_id = t.id
+        LEFT JOIN
+            sys_user tu ON t.user_id = tu.id
+        WHERE
+            cs.id = #{id}
+    </select>
+
+    <!-- 查询学生已选课程 -->
+    <select id="selectStudentCourses" resultType="java.util.Map">
+        SELECT 
+            cs.id,
+            cs.student_id,
+            cs.course_offering_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit AS credits,
+            c.type AS course_type,
+            co.semester,
+            c.hours AS teaching_hours,
+            c.description AS course_description,
+            tu.name AS teacher_name,
+            co.class_time,
+            co.location,
+            cs.status,
+            cs.selection_time,
+            co.status AS course_status
+        FROM 
+            course_selection cs
+        INNER JOIN 
+            course_offering co ON cs.course_offering_id = co.id
+        INNER JOIN 
+            course c ON co.course_id = c.id
+        LEFT JOIN 
+            teacher t ON co.teacher_id = t.id
+        LEFT JOIN
+            sys_user tu ON t.user_id = tu.id
+        WHERE 
+            cs.student_id = #{studentId}
+            AND cs.status != 2
+            <if test="courseName != null and courseName != ''">
+                AND c.name LIKE CONCAT('%', #{courseName}, '%')
+            </if>
+            <if test="courseCode != null and courseCode != ''">
+                AND c.code LIKE CONCAT('%', #{courseCode}, '%')
+            </if>
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+        ORDER BY co.semester DESC, c.code
+    </select>
+
+    <!-- 统计课程已选人数 -->
+    <select id="countSelectedStudents" resultType="int">
+        SELECT 
+            COUNT(1)
+        FROM 
+            course_selection
+        WHERE 
+            course_offering_id = #{courseOfferingId}
+            AND status != 2
+    </select>
+
+    <!-- 统计选课总数 -->
+    <select id="countTotalSelections" resultType="int">
+        SELECT 
+            COUNT(1)
+        FROM 
+            course_selection
+    </select>
+
+    <!-- 统计指定状态的选课数量 -->
+    <select id="countSelectionsByStatus" resultType="int">
+        SELECT 
+            COUNT(1)
+        FROM 
+            course_selection
+        WHERE 
+            status = #{status}
+    </select>
+
+    <!-- 统计选课学生数量 -->
+    <select id="countDistinctStudents" resultType="int">
+        SELECT
+            COUNT(DISTINCT student_id)
+        FROM
+            course_selection
+    </select>
+    
+    <!-- 查询当前学期选课数量 -->
+    <select id="countCurrentSemesterSelections" resultType="int">
+        SELECT 
+            COUNT(1)
+        FROM 
+            course_selection cs
+        INNER JOIN 
+            course_offering co ON cs.course_offering_id = co.id
+        WHERE 
+            co.semester = #{semester}
+            AND cs.status != 1 -- 不统计已退选的
+    </select>
+    
+    <!-- 统计已修完课程数量 -->
+    <select id="countCompletedSelections" resultType="int">
+        SELECT 
+            COUNT(1)
+        FROM 
+            course_selection
+        WHERE 
+            status = 2 -- 状态为2表示已修完
+    </select>
+
+    <!-- 查询课程类型选课比例数据 -->
+    <select id="selectCourseTypeStatistics" resultType="com.example.student.vo.CourseTypeStatisticsVO">
+        SELECT
+            CASE 
+                WHEN c.type = 0 THEN '必修课'
+                WHEN c.type = 1 THEN '选修课'
+                WHEN c.type = 2 THEN '公共课'
+                ELSE '其他课程'
+            END AS name,
+            COUNT(cs.id) AS value
+        FROM
+            course_selection cs
+        INNER JOIN 
+            course_offering co ON cs.course_offering_id = co.id
+        INNER JOIN 
+            course c ON co.course_id = c.id
+        WHERE
+            cs.status != 1  -- 不统计已退选的课程
+        GROUP BY c.type
+    </select>
+
+    <!-- 查询学期选课统计数据 -->
+    <select id="selectSemesterStatistics" resultType="com.example.student.vo.SemesterStatisticsVO">
+        SELECT
+            co.semester,
+            COUNT(cs.id) AS count
+        FROM
+            course_selection cs
+        INNER JOIN 
+            course_offering co ON cs.course_offering_id = co.id
+        WHERE 
+            cs.status != 1  -- 不统计已退选的课程
+        GROUP BY co.semester
+        ORDER BY co.semester DESC
+    </select>
+
+    <!-- 查询学期列表 -->
+    <select id="selectSemesters" resultType="com.example.student.vo.SemesterVO">
+        SELECT 
+            semester AS value,
+            CASE 
+                WHEN semester REGEXP '^[0-9]{4}-[0-9]{4}-[1-2]$' THEN
+                    CONCAT(SUBSTRING_INDEX(semester, '-', 2), '学年第', 
+                        CASE WHEN RIGHT(semester, 1) = '1' THEN '一' ELSE '二' END, '学期')
+                ELSE semester
+            END AS label
+        FROM 
+            (SELECT DISTINCT semester FROM course_offering) AS temp
+        ORDER BY semester DESC
+    </select>
+
+    <!-- 统计学生已选课程数量 -->
+    <select id="countStudentSelectedCourses" resultType="int">
+        SELECT 
+            COUNT(1)
+        FROM 
+            course_selection cs
+        INNER JOIN 
+            course_offering co ON cs.course_offering_id = co.id
+        WHERE 
+            cs.student_id = #{studentId}
+            AND cs.status != 2
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+    </select>
+
+    <!-- 统计学生已选学分总数 -->
+    <select id="sumStudentSelectedCredits" resultType="double">
+        SELECT 
+            IFNULL(SUM(c.credit), 0)
+        FROM 
+            course_selection cs
+        INNER JOIN 
+            course_offering co ON cs.course_offering_id = co.id
+        INNER JOIN 
+            course c ON co.course_id = c.id
+        WHERE
+            cs.student_id = #{studentId}
+            AND cs.status != 2
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+    </select>
+
+    <!-- 查询成绩概览统计数据 -->
+    <select id="selectGradeOverviewStats" resultType="java.util.Map">
+        SELECT 
+            COUNT(cs.id) AS totalStudents,
+            AVG(cs.score) AS averageScore,
+            SUM(CASE WHEN cs.score >= 60 THEN 1 ELSE 0 END) AS passCount,
+            SUM(CASE WHEN cs.score >= 90 THEN 1 ELSE 0 END) AS excellentCount,
+            SUM(CASE WHEN cs.score IS NOT NULL THEN 1 ELSE 0 END) AS totalWithScore
+        FROM
+            course_selection cs
+            JOIN course_offering co ON cs.course_offering_id = co.id
+            JOIN student s ON cs.student_id = s.id
+            JOIN sys_user u ON s.user_id = u.id
+            JOIN class c ON s.class_id = c.id
+        WHERE
+            cs.status = 2
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+            <if test="courseId != null">
+                AND co.course_id = #{courseId}
+            </if>
+            <if test="classId != null">
+                AND c.id = #{classId}
+            </if>
+    </select>
+    
+    <!-- 查询分数分布 -->
+    <select id="selectScoreDistribution" resultType="java.util.Map">
+        SELECT
+            CASE 
+                WHEN cs.score >= 90 THEN '90-100'
+                WHEN cs.score >= 80 THEN '80-89'
+                WHEN cs.score >= 70 THEN '70-79'
+                WHEN cs.score >= 60 THEN '60-69'
+                WHEN cs.score >= 0 THEN '0-59'
+                ELSE 'N/A'
+            END AS scoreRange,
+            COUNT(cs.id) AS count
+        FROM
+            course_selection cs
+            JOIN course_offering co ON cs.course_offering_id = co.id
+            JOIN student s ON cs.student_id = s.id
+            JOIN sys_user u ON s.user_id = u.id
+            JOIN class c ON s.class_id = c.id
+        WHERE
+            cs.status = 2 AND cs.score IS NOT NULL
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+            <if test="courseId != null">
+                AND co.course_id = #{courseId}
+            </if>
+            <if test="classId != null">
+                AND c.id = #{classId}
+            </if>
+        GROUP BY
+            CASE 
+                WHEN cs.score >= 90 THEN '90-100'
+                WHEN cs.score >= 80 THEN '80-89'
+                WHEN cs.score >= 70 THEN '70-79'
+                WHEN cs.score >= 60 THEN '60-69'
+                WHEN cs.score >= 0 THEN '0-59'
+                ELSE 'N/A'
+            END
+        ORDER BY
+            CASE scoreRange
+                WHEN '90-100' THEN 1
+                WHEN '80-89' THEN 2
+                WHEN '70-79' THEN 3
+                WHEN '60-69' THEN 4
+                WHEN '0-59' THEN 5
+                ELSE 6
+            END
+    </select>
+    
+    <!-- 查询班级成绩统计 -->
+    <select id="selectClassGradeStats" resultType="java.util.Map">
+        SELECT
+            c.name AS className,
+            COUNT(cs.id) AS totalStudents,
+            ROUND(AVG(cs.score), 2) AS averageScore,
+            MAX(cs.score) AS maxScore,
+            MIN(cs.score) AS minScore,
+            SUM(CASE WHEN cs.score >= 60 THEN 1 ELSE 0 END) AS passCount,
+            SUM(CASE WHEN cs.score &lt; 60 THEN 1 ELSE 0 END) AS failCount,
+            SUM(CASE WHEN cs.score >= 90 THEN 1 ELSE 0 END) AS excellentCount
+        FROM
+            course_selection cs
+            JOIN course_offering co ON cs.course_offering_id = co.id
+            JOIN student s ON cs.student_id = s.id
+            JOIN sys_user u ON s.user_id = u.id
+            JOIN class c ON s.class_id = c.id
+        WHERE
+            cs.status = 2 AND cs.score IS NOT NULL
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+            <if test="courseId != null">
+                AND co.course_id = #{courseId}
+            </if>
+            <if test="classId != null">
+                AND c.id = #{classId}
+            </if>
+        GROUP BY
+            c.id, c.name
+        ORDER BY
+            averageScore DESC
+    </select>
+
+    <!-- 查询学生成绩列表 -->
+    <select id="selectStudentsWithGrades" resultType="com.example.student.vo.StudentGradeVO">
+        SELECT
+            cs.id AS selectionId,
+            s.id AS studentId,
+            s.student_no AS studentNo,
+            u.name AS studentName,
+            s.gender,
+            cl.id AS classId,
+            cl.name AS className,
+            cl.major_id AS majorId,
+            m.name AS majorName,
+            c.id AS courseId,
+            c.code AS courseCode,
+            c.name AS courseName,
+            c.type AS courseType,
+            CASE 
+                WHEN c.type = 0 THEN '必修课'
+                WHEN c.type = 1 THEN '选修课'
+                ELSE '其他'
+            END AS courseTypeDesc,
+            c.credit,
+            co.semester,
+            cs.score,
+            cs.status,
+            CASE 
+                WHEN cs.status = 0 THEN '已选'
+                WHEN cs.status = 1 THEN '已退'
+                WHEN cs.status = 2 THEN '已修完'
+                ELSE '未知'
+            END AS statusDesc,
+            cs.selection_time AS selectionTime,
+            CASE 
+                WHEN cs.score >= 60 THEN 1
+                WHEN cs.score IS NOT NULL THEN 0
+                ELSE NULL
+            END AS isPassed,
+            CASE 
+                WHEN cs.score >= 60 THEN '通过'
+                WHEN cs.score IS NOT NULL THEN '未通过'
+                ELSE '未评分'
+            END AS isPassedDesc
+        FROM
+            course_selection cs
+            JOIN course_offering co ON cs.course_offering_id = co.id
+            JOIN course c ON co.course_id = c.id
+            JOIN student s ON cs.student_id = s.id
+            JOIN sys_user u ON s.user_id = u.id
+            JOIN class cl ON s.class_id = cl.id
+            LEFT JOIN major m ON cl.major_id = m.id
+        WHERE
+            1=1
+            <if test="courseOfferingId != null">
+                AND co.id = #{courseOfferingId}
+            </if>
+            <if test="courseId != null">
+                AND c.id = #{courseId}
+            </if>
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+            <if test="classId != null">
+                AND cl.id = #{classId}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (u.name LIKE CONCAT('%', #{keyword}, '%') OR s.student_no LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        ORDER BY
+            cl.id, s.student_no
+    </select>
+</mapper> 

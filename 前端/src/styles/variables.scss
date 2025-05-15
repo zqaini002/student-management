@@ -1,0 +1,58 @@
+// 声明为模块，使其可被@use引用
+// sass:export用于导出变量供JavaScript使用
+@use 'sass:map';
+
+// 主题色变量
+$--color-primary: #1890ff;
+$--color-success: #52c41a;
+$--color-warning: #faad14;
+$--color-danger: #f5222d;
+$--color-info: #909399;
+
+// 侧边栏
+$sideBarWidth: 220px;
+$sideBarCollapsedWidth: 64px;
+
+// 头部高度
+$navbarHeight: 60px;
+
+// 标签栏高度
+$tagViewHeight: 40px;
+
+// 字体颜色
+$--color-text-primary: #303133;
+$--color-text-regular: #606266;
+$--color-text-secondary: #909399;
+$--color-text-placeholder: #c0c4cc;
+
+// 边框颜色
+$--border-color-base: #dcdfe6;
+$--border-color-light: #e4e7ed;
+$--border-color-lighter: #ebeef5;
+$--border-color-extra-light: #f2f6fc;
+
+// 背景颜色
+$--background-color-base: #f5f7fa;
+
+// 响应式布局断点
+$--sm: 768px;
+$--md: 992px;
+$--lg: 1200px;
+$--xl: 1920px;
+
+// 导出给js使用 - 使用Sass模块导出
+@mixin export-variables {
+  :export {
+    colorPrimary: $--color-primary;
+    colorSuccess: $--color-success;
+    colorWarning: $--color-warning;
+    colorDanger: $--color-danger;
+    colorInfo: $--color-info;
+    sideBarWidth: $sideBarWidth;
+    navbarHeight: $navbarHeight;
+    tagViewHeight: $tagViewHeight;
+  }
+}
+
+// 应用导出
+@include export-variables; 

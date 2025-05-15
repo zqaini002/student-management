@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.student.mapper.TeacherMapper">
+    
+    <!-- 教师视图对象结果映射 -->
+    <resultMap id="TeacherVOResultMap" type="com.example.student.vo.TeacherVO">
+        <id property="id" column="id"/>
+        <result property="teacherNo" column="teacher_no"/>
+        <result property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="name" column="name"/>
+        <result property="departmentId" column="department_id"/>
+        <result property="departmentName" column="department_name"/>
+        <result property="title" column="title"/>
+        <result property="gender" column="gender"/>
+        <result property="genderDesc" column="gender_desc"/>
+        <result property="idCard" column="id_card"/>
+        <result property="birthday" column="birthday"/>
+        <result property="entryDate" column="entry_date"/>
+        <result property="status" column="status"/>
+        <result property="statusDesc" column="status_desc"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+        <result property="avatar" column="avatar"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    
+    <!-- 教师课程视图对象结果映射 -->
+    <resultMap id="TeacherCourseVOResultMap" type="com.example.student.vo.TeacherCourseVO">
+        <id property="id" column="id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="courseName" column="course_name"/>
+        <result property="courseCode" column="course_code"/>
+        <result property="credit" column="credit"/>
+        <result property="hours" column="hours"/>
+        <result property="courseType" column="course_type"/>
+        <result property="courseTypeDesc" column="course_type_desc"/>
+        <result property="semester" column="semester"/>
+        <result property="classTime" column="class_time"/>
+        <result property="location" column="location"/>
+        <result property="capacity" column="capacity"/>
+        <result property="selectedCount" column="selected_count"/>
+        <result property="status" column="status"/>
+        <result property="statusDesc" column="status_desc"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+    
+    <!-- 教师课程学生视图对象结果映射 -->
+    <resultMap id="TeacherCourseStudentVOResultMap" type="com.example.student.vo.TeacherCourseStudentVO">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+        <result property="studentNo" column="student_no"/>
+        <result property="studentName" column="student_name"/>
+        <result property="classId" column="class_id"/>
+        <result property="className" column="class_name"/>
+        <result property="majorName" column="major_name"/>
+        <result property="departmentName" column="department_name"/>
+        <result property="gender" column="gender"/>
+        <result property="genderDesc" column="gender_desc"/>
+        <result property="selectionTime" column="selection_time"/>
+        <result property="score" column="score"/>
+        <result property="status" column="status"/>
+        <result property="statusDesc" column="status_desc"/>
+        <result property="attendanceRate" column="attendance_rate"/>
+        <result property="lastAttendanceStatus" column="last_attendance_status"/>
+        <result property="lastAttendanceDate" column="last_attendance_date"/>
+        <result property="lastAttendanceDesc" column="last_attendance_desc"/>
+    </resultMap>
+    
+    <!-- 分页查询教师列表 -->
+    <select id="selectTeacherPage" resultMap="TeacherVOResultMap">
+        SELECT
+            t.id,
+            t.teacher_no,
+            t.user_id,
+            u.username,
+            u.name,
+            t.department_id,
+            d.name AS department_name,
+            t.title,
+            t.gender,
+            CASE t.gender WHEN 0 THEN '男' WHEN 1 THEN '女' END AS gender_desc,
+            t.id_card,
+            t.birthday,
+            t.entry_date,
+            t.status,
+            CASE t.status WHEN 0 THEN '在职' WHEN 1 THEN '离职' WHEN 2 THEN '退休' END AS status_desc,
+            u.email,
+            u.phone,
+            u.avatar,
+            t.create_time,
+            t.update_time
+        FROM
+            teacher t
+        JOIN
+            sys_user u ON t.user_id = u.id
+        JOIN
+            department d ON t.department_id = d.id
+        <where>
+            <if test="teacherNo != null and teacherNo != ''">
+                AND t.teacher_no LIKE CONCAT('%', #{teacherNo}, '%')
+            </if>
+            <if test="name != null and name != ''">
+                AND u.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="departmentId != null">
+                AND t.department_id = #{departmentId}
+            </if>
+            <if test="title != null and title != ''">
+                AND t.title = #{title}
+            </if>
+            <if test="status != null">
+                AND t.status = #{status}
+            </if>
+            <if test="email != null and email != ''">
+                AND u.email LIKE CONCAT('%', #{email}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND u.phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="birthdayStart != null and birthdayStart != ''">
+                AND t.birthday &gt;= #{birthdayStart}
+            </if>
+            <if test="birthdayEnd != null and birthdayEnd != ''">
+                AND t.birthday &lt;= #{birthdayEnd}
+            </if>
+            <if test="entryDateStart != null and entryDateStart != ''">
+                AND t.entry_date &gt;= #{entryDateStart}
+            </if>
+            <if test="entryDateEnd != null and entryDateEnd != ''">
+                AND t.entry_date &lt;= #{entryDateEnd}
+            </if>
+        </where>
+        ORDER BY t.create_time DESC
+    </select>
+    
+    <!-- 根据ID查询教师 -->
+    <select id="selectTeacherById" resultMap="TeacherVOResultMap">
+        SELECT
+            t.id,
+            t.teacher_no,
+            t.user_id,
+            u.username,
+            u.name,
+            t.department_id,
+            d.name AS department_name,
+            t.title,
+            t.gender,
+            CASE t.gender WHEN 0 THEN '男' WHEN 1 THEN '女' END AS gender_desc,
+            t.id_card,
+            t.birthday,
+            t.entry_date,
+            t.status,
+            CASE t.status WHEN 0 THEN '在职' WHEN 1 THEN '离职' WHEN 2 THEN '退休' END AS status_desc,
+            u.email,
+            u.phone,
+            u.avatar,
+            t.create_time,
+            t.update_time
+        FROM
+            teacher t
+        JOIN
+            sys_user u ON t.user_id = u.id
+        JOIN
+            department d ON t.department_id = d.id
+        WHERE
+            t.id = #{id}
+    </select>
+    
+    <!-- 根据用户ID查询教师 -->
+    <select id="selectTeacherByUserId" resultType="com.example.student.entity.Teacher">
+        SELECT *
+        FROM teacher
+        WHERE user_id = #{userId}
+    </select>
+    
+    <!-- 分页查询教师课程列表 -->
+    <select id="selectTeacherCoursePage" resultMap="TeacherCourseVOResultMap">
+        SELECT
+            co.id,
+            c.id AS course_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit,
+            c.hours,
+            c.type AS course_type,
+            CASE c.type WHEN 0 THEN '必修' WHEN 1 THEN '选修' END AS course_type_desc,
+            co.semester,
+            co.class_time,
+            co.location,
+            co.capacity,
+            co.selected_count,
+            co.status,
+            CASE co.status WHEN 0 THEN '正常' WHEN 1 THEN '已结课' END AS status_desc,
+            co.create_time,
+            co.update_time
+        FROM
+            course_offering co
+        JOIN
+            course c ON co.course_id = c.id
+        WHERE
+            co.teacher_id = #{teacherId}
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+            <if test="courseName != null and courseName != ''">
+                AND c.name LIKE CONCAT('%', #{courseName}, '%')
+            </if>
+            <if test="status != null">
+                AND co.status = #{status}
+            </if>
+        ORDER BY co.create_time DESC
+    </select>
+    
+    <!-- 分页查询教师课程学生列表 -->
+    <select id="selectTeacherCourseStudentPage" resultMap="TeacherCourseStudentVOResultMap">
+        SELECT
+            cs.id,
+            s.id AS student_id,
+            s.student_no,
+            u.name AS student_name,
+            s.class_id,
+            cl.name AS class_name,
+            m.name AS major_name,
+            d.name AS department_name,
+            s.gender,
+            CASE s.gender WHEN 0 THEN '男' WHEN 1 THEN '女' END AS gender_desc,
+            cs.selection_time,
+            cs.score,
+            cs.status,
+            CASE cs.status 
+                WHEN 0 THEN '已选' 
+                WHEN 1 THEN '已退' 
+                WHEN 2 THEN '已修完' 
+            END AS status_desc,
+            (
+                SELECT COUNT(CASE WHEN a.status = 0 THEN 1 END) * 100.0 / COUNT(*) 
+                FROM attendance a 
+                WHERE a.student_id = s.id AND a.course_offering_id = #{courseId}
+            ) AS attendance_rate,
+            (
+                SELECT a.status 
+                FROM attendance a 
+                WHERE a.student_id = s.id AND a.course_offering_id = #{courseId} 
+                ORDER BY a.attendance_date DESC 
+                LIMIT 1
+            ) AS last_attendance_status,
+            (
+                SELECT a.attendance_date 
+                FROM attendance a 
+                WHERE a.student_id = s.id AND a.course_offering_id = #{courseId} 
+                ORDER BY a.attendance_date DESC 
+                LIMIT 1
+            ) AS last_attendance_date,
+            (
+                SELECT 
+                    CASE a.status 
+                        WHEN 0 THEN '出勤' 
+                        WHEN 1 THEN '缺勤' 
+                        WHEN 2 THEN '迟到' 
+                        WHEN 3 THEN '早退' 
+                        WHEN 4 THEN '请假' 
+                    END
+                FROM attendance a 
+                WHERE a.student_id = s.id AND a.course_offering_id = #{courseId} 
+                ORDER BY a.attendance_date DESC 
+                LIMIT 1
+            ) AS last_attendance_desc
+        FROM
+            course_selection cs
+        JOIN
+            student s ON cs.student_id = s.id
+        JOIN
+            sys_user u ON s.user_id = u.id
+        JOIN
+            class cl ON s.class_id = cl.id
+        JOIN
+            major m ON cl.major_id = m.id
+        JOIN
+            department d ON m.department_id = d.id
+        WHERE
+            cs.course_offering_id = #{courseId}
+            <if test="studentName != null and studentName != ''">
+                AND u.name LIKE CONCAT('%', #{studentName}, '%')
+            </if>
+            <if test="studentNo != null and studentNo != ''">
+                AND s.student_no LIKE CONCAT('%', #{studentNo}, '%')
+            </if>
+            <if test="status != null">
+                AND cs.status = #{status}
+            </if>
+        ORDER BY cs.selection_time DESC
+    </select>
+    
+    <!-- 获取教师统计数据 -->
+    <select id="selectTeacherStatistics" resultType="java.util.HashMap">
+        SELECT
+            (SELECT COUNT(*) FROM course_offering WHERE teacher_id = #{teacherId}) AS course_count,
+            (SELECT COUNT(*) FROM course_offering WHERE teacher_id = #{teacherId} AND status = 0) AS active_course_count,
+            (SELECT COUNT(*) FROM course_offering WHERE teacher_id = #{teacherId} AND status = 1) AS completed_course_count,
+            (SELECT COUNT(*) 
+             FROM course_selection cs 
+             JOIN course_offering co ON cs.course_offering_id = co.id 
+             WHERE co.teacher_id = #{teacherId}) AS student_count,
+            (SELECT COUNT(*) 
+             FROM attendance a 
+             JOIN course_offering co ON a.course_offering_id = co.id 
+             WHERE co.teacher_id = #{teacherId}) AS attendance_count,
+            (SELECT COUNT(*) 
+             FROM attendance a 
+             JOIN course_offering co ON a.course_offering_id = co.id 
+             WHERE co.teacher_id = #{teacherId} AND a.status = 0) AS attendance_normal_count,
+            (SELECT COUNT(*) 
+             FROM attendance a 
+             JOIN course_offering co ON a.course_offering_id = co.id 
+             WHERE co.teacher_id = #{teacherId} AND a.status = 1) AS attendance_absent_count,
+            (SELECT COUNT(*) 
+             FROM attendance a 
+             JOIN course_offering co ON a.course_offering_id = co.id 
+             WHERE co.teacher_id = #{teacherId} AND a.status = 2) AS attendance_late_count,
+            (SELECT COUNT(*) 
+             FROM attendance a 
+             JOIN course_offering co ON a.course_offering_id = co.id 
+             WHERE co.teacher_id = #{teacherId} AND a.status = 3) AS attendance_early_count,
+            (SELECT COUNT(*) 
+             FROM attendance a 
+             JOIN course_offering co ON a.course_offering_id = co.id 
+             WHERE co.teacher_id = #{teacherId} AND a.status = 4) AS attendance_leave_count
+    </select>
+    
+    <!-- 检查教师是否有权限操作课程 -->
+    <select id="checkTeacherCoursePermission" resultType="java.lang.Integer">
+        SELECT
+            COUNT(*)
+        FROM
+            course_offering
+        WHERE
+            id = #{courseId}
+            AND teacher_id = #{teacherId}
+    </select>
+    
+    <!-- 获取教师选项列表（ID和姓名） -->
+    <select id="selectTeacherOptions" resultType="java.util.Map">
+        SELECT
+            t.id AS value,
+            u.name AS label
+        FROM
+            teacher t
+        JOIN
+            sys_user u ON t.user_id = u.id
+        WHERE
+            t.status = 0
+        ORDER BY
+            u.name
+    </select>
+
+    <!-- 根据姓名搜索教师 -->
+    <select id="searchTeachersByName" resultType="java.util.Map">
+        SELECT
+            t.id AS value,
+            u.name AS label
+        FROM
+            teacher t
+        JOIN
+            sys_user u ON t.user_id = u.id
+        WHERE
+            t.status = 0
+            <if test="name != null and name != ''">
+                AND u.name LIKE CONCAT('%', #{name}, '%')
+            </if>
+        ORDER BY
+            u.name
+        LIMIT 10
+    </select>
+</mapper>

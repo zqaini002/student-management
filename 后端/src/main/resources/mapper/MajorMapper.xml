@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.student.mapper.MajorMapper">
+    
+    <!-- 基础结果映射 -->
+    <resultMap id="BaseResultMap" type="com.example.student.entity.Major">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="code" property="code" />
+        <result column="department_id" property="departmentId" />
+        <result column="description" property="description" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <!-- VO结果映射 -->
+    <resultMap id="MajorVOResultMap" type="com.example.student.vo.MajorVO" extends="BaseResultMap">
+        <result column="department_name" property="departmentName" />
+    </resultMap>
+    
+    <!-- 查询专业详情 -->
+    <select id="selectMajorById" parameterType="java.lang.Long" resultType="com.example.student.entity.Major">
+        SELECT *
+        FROM major
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 分页查询专业列表 -->
+    <select id="selectMajorList" resultType="com.example.student.entity.Major">
+        SELECT *
+        FROM major
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 查询专业VO列表（包含院系名称） -->
+    <select id="selectMajorVOList" resultMap="MajorVOResultMap">
+        SELECT 
+            m.id, m.name, m.code, m.department_id, m.description, m.create_time, m.update_time,
+            d.name as department_name
+        FROM major m
+        LEFT JOIN department d ON m.department_id = d.id
+        ORDER BY m.update_time DESC
+    </select>
+    
+    <!-- 分页查询专业VO列表（包含院系名称） -->
+    <select id="selectMajorVOPage" resultMap="MajorVOResultMap">
+        SELECT 
+            m.id, m.name, m.code, m.department_id, m.description, m.create_time, m.update_time,
+            d.name as department_name
+        FROM major m
+        LEFT JOIN department d ON m.department_id = d.id
+        <where>
+            <if test="major.name != null and major.name != ''">
+                AND m.name LIKE CONCAT('%', #{major.name}, '%')
+            </if>
+            <if test="major.code != null and major.code != ''">
+                AND m.code LIKE CONCAT('%', #{major.code}, '%')
+            </if>
+            <if test="major.departmentId != null">
+                AND m.department_id = #{major.departmentId}
+            </if>
+        </where>
+        ORDER BY m.update_time DESC
+    </select>
+    
+    <!-- 根据ID查询专业VO详情（包含院系名称） -->
+    <select id="selectMajorVOById" resultMap="MajorVOResultMap">
+        SELECT 
+            m.id, m.name, m.code, m.department_id, m.description, m.create_time, m.update_time,
+            d.name as department_name
+        FROM major m
+        LEFT JOIN department d ON m.department_id = d.id
+        WHERE m.id = #{id}
+    </select>
+    
+    <!-- 查询专业选项列表（适用于下拉框） -->
+    <select id="selectMajorOptions" resultType="java.util.Map">
+        SELECT 
+            m.id as value,
+            CONCAT(m.name, ' (', m.code, ')') as label
+        FROM 
+            major m
+        ORDER BY 
+            m.name
+    </select>
+    
+</mapper> 

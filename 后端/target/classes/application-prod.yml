@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 生产环境数据库配置（此处为示例，需根据实际情况修改）
+    url: jdbc:mysql://127.0.0.1:3306/student_management_system?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: prod_user
+    password: StrongPassword123!
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      password: StrongRedisPassword123!
+      
+# 生产环境特定日志配置
+logging:
+  level:
+    com.example.student: WARN
+    org.springframework.web: WARN
+    org.mybatis: WARN
+    
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    # 生产环境关闭SQL日志输出
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl 

@@ -1,0 +1,132 @@
+// Element Plus样式覆盖
+
+// 修改主题色变量
+:root {
+  --el-color-primary: #1890ff;
+  --el-color-success: #52c41a;
+  --el-color-warning: #faad14;
+  --el-color-danger: #f5222d;
+  --el-color-info: #909399;
+}
+
+// 统一边框圆角
+.el-button, 
+.el-input__inner, 
+.el-textarea__inner, 
+.el-select-dropdown, 
+.el-card {
+  border-radius: 4px;
+}
+
+// 下拉选择框全局样式优化
+.el-select {
+  width: auto;
+  min-width: 150px;
+}
+
+.el-select-dropdown {
+  min-width: 150px !important;
+}
+
+// 表格样式优化
+.el-table {
+  width: 100%;
+  &::before {
+    height: 0;
+  }
+  .el-table__header th {
+    background-color: #f5f7fa;
+    color: #606266;
+    font-weight: 600;
+    height: 48px;
+  }
+  .el-table__body td {
+    padding: 12px 0;
+  }
+  .el-button--text {
+    padding: 0 8px;
+  }
+}
+
+// 分页组件
+.el-pagination {
+  margin-top: 20px;
+  justify-content: flex-end;
+  .el-pagination__total {
+    font-size: 13px;
+  }
+}
+
+// 弹窗样式优化
+.el-dialog {
+  border-radius: 8px;
+  .el-dialog__header {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 16px 20px;
+    margin-right: 0;
+    .el-dialog__title {
+      font-weight: 600;
+      font-size: 16px;
+    }
+  }
+  .el-dialog__footer {
+    border-top: 1px solid #f0f0f0;
+    padding: 10px 20px;
+  }
+}
+
+// 表单样式
+.el-form {
+  .el-form-item {
+    margin-bottom: 22px;
+  }
+  .el-form-item__label {
+    font-weight: 500;
+  }
+}
+
+// 卡片样式
+.el-card {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, .05);
+  border: none;
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .1);
+    transition: all 0.3s;
+  }
+  .el-card__header {
+    padding: 16px 20px;
+    font-weight: 600;
+    border-bottom: 1px solid #f0f0f0;
+  }
+}
+
+// 标签页样式
+.el-tabs {
+  .el-tabs__item {
+    height: 40px;
+    line-height: 40px;
+    &.is-active {
+      font-weight: 600;
+    }
+  }
+}
+
+// 按钮样式优化
+.el-button {
+  &--primary {
+    --el-button-hover-bg-color: #40a9ff;
+    --el-button-active-bg-color: #096dd9;
+  }
+  &--success {
+    --el-button-hover-bg-color: #73d13d;
+    --el-button-active-bg-color: #389e0d;
+  }
+  &--warning {
+    --el-button-hover-bg-color: #ffc53d;
+    --el-button-active-bg-color: #d48806;
+  }
+  &--danger {
+    --el-button-hover-bg-color: #ff4d4f;
+    --el-button-active-bg-color: #cf1322;
+  }
+} 

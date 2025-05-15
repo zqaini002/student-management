@@ -1,0 +1,161 @@
+@use './variables.scss' as *;
+
+.app-wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  .sidebar-container {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: $sideBarWidth;
+    height: 100%;
+    background: #001529;
+    transition: width 0.28s;
+    z-index: 1001;
+    overflow: hidden;
+    box-shadow: 2px 0 6px rgba(0, 21, 41, 0.35);
+
+    .logo {
+      height: 60px;
+      line-height: 60px;
+      background: #002140;
+      text-align: center;
+      overflow: hidden;
+      padding: 0 16px;
+      
+      img {
+        width: 32px;
+        vertical-align: middle;
+        margin-right: 12px;
+      }
+      
+      h1 {
+        display: inline-block;
+        margin: 0;
+        color: white;
+        font-weight: 600;
+        font-size: 18px;
+        vertical-align: middle;
+      }
+    }
+
+    // 滚动区域
+    .scrollbar-wrapper {
+      height: calc(100% - 60px);
+      overflow-x: hidden;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    .el-menu {
+      border: none;
+      height: 100%;
+      width: 100%;
+      background-color: transparent;
+    }
+
+    .el-menu-item, .el-sub-menu__title {
+      height: 50px;
+      line-height: 50px;
+      color: hsla(0,0%,100%,.65);
+      
+      &:hover {
+        color: #fff;
+        background-color: #1890ff !important;
+      }
+      
+      &.is-active {
+        color: #fff;
+        background-color: #1890ff !important;
+      }
+    }
+
+    .el-sub-menu {
+      .el-menu-item {
+        min-width: 180px;
+        padding-left: 50px !important;
+        background-color: #000c17 !important;
+        
+        &.is-active {
+          background-color: #1890ff !important;
+        }
+      }
+    }
+
+    // 侧边栏折叠状态
+    .el-menu--collapse {
+      width: $sideBarCollapsedWidth;
+      
+      .el-sub-menu__title {
+        span, .el-sub-menu__icon-arrow {
+          display: none;
+        }
+      }
+    }
+    
+    // 菜单图标样式
+    .menu-icon {
+      margin-right: 16px;
+      font-size: 18px;
+      vertical-align: middle;
+      width: 24px;
+      text-align: center;
+    }
+  }
+
+  // 折叠状态
+  &.hide-sidebar {
+    .sidebar-container {
+      width: $sideBarCollapsedWidth;
+      .logo {
+        img {
+          margin-right: 0;
+        }
+        h1 {
+          display: none;
+        }
+      }
+    }
+    .main-container {
+      margin-left: $sideBarCollapsedWidth;
+    }
+  }
+
+  // 主内容区域
+  .main-container {
+    min-height: 100%;
+    transition: margin-left 0.28s;
+    margin-left: $sideBarWidth;
+    position: relative;
+  }
+}
+
+// 移动端适配
+@media screen and (max-width: 992px) {
+  .app-wrapper {
+    .sidebar-container {
+      transform: translate3d(-$sideBarWidth, 0, 0);
+    }
+    
+    .main-container {
+      margin-left: 0;
+    }
+    
+    &.hide-sidebar {
+      .sidebar-container {
+        transform: translate3d(0, 0, 0);
+      }
+    }
+  }
+} 

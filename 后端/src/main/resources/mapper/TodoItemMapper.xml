@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.student.mapper.TodoItemMapper">
+
+    <resultMap id="TodoItemResult" type="com.example.student.entity.TodoItem">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="status" column="status"/>
+        <result property="dueDate" column="due_date"/>
+        <result property="priority" column="priority"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="selectTodoItemList" parameterType="com.example.student.entity.TodoItem" resultMap="TodoItemResult">
+        SELECT 
+            id, user_id, title, content, status, due_date, priority, create_time, update_time
+        FROM 
+            todo_item
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="title != null and title != ''">
+                AND title like concat('%', #{title}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="priority != null">
+                AND priority = #{priority}
+            </if>
+        </where>
+        ORDER BY priority DESC, due_date ASC
+    </select>
+
+    <select id="selectTodoItemById" parameterType="Long" resultMap="TodoItemResult">
+        SELECT 
+            id, user_id, title, content, status, due_date, priority, create_time, update_time
+        FROM 
+            todo_item
+        WHERE 
+            id = #{id}
+    </select>
+
+    <insert id="insertTodoItem" parameterType="com.example.student.entity.TodoItem" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO todo_item (
+            user_id, title, content, status, due_date, priority, create_time, update_time
+        ) VALUES (
+            #{userId}, #{title}, #{content}, #{status}, #{dueDate}, #{priority}, NOW(), NOW()
+        )
+    </insert>
+
+    <update id="updateTodoItem" parameterType="com.example.student.entity.TodoItem">
+        UPDATE todo_item
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="dueDate != null">due_date = #{dueDate},</if>
+            <if test="priority != null">priority = #{priority},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteTodoItemById" parameterType="Long">
+        DELETE FROM todo_item WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteTodoItemByIds" parameterType="Long">
+        DELETE FROM todo_item WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="completeTodoItem" parameterType="Long">
+        UPDATE todo_item
+        SET status = 1, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+</mapper> 

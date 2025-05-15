@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.student.mapper.GradeMapper">
+
+    <!-- 查询学生成绩列表 -->
+    <select id="selectStudentGrades" resultType="java.util.Map">
+        SELECT 
+            g.id,
+            g.student_id,
+            u.name AS student_name,
+            co.course_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit AS credits,
+            c.type AS course_type,
+            co.semester,
+            g.score,
+            g.status,
+            g.create_time,
+            g.update_time,
+            DATE_FORMAT(co.exam_time, '%Y-%m-%d %H:%i') AS examTime,
+            CASE
+                WHEN g.score IS NULL THEN NULL
+                ELSE (
+                    SELECT COUNT(*) + 1
+                    FROM course_selection cs
+                    JOIN course_offering co2 ON cs.course_offering_id = co2.id
+                    WHERE co2.course_id = co.course_id 
+                    AND co2.semester = co.semester
+                    AND cs.score > g.score
+                    AND cs.status = 1
+                )
+            END AS ranking,
+            CASE
+                WHEN g.score IS NULL THEN NULL
+                ELSE (
+                    SELECT COUNT(*)
+                    FROM course_selection cs
+                    JOIN course_offering co2 ON cs.course_offering_id = co2.id
+                    WHERE co2.course_id = co.course_id 
+                    AND co2.semester = co.semester
+                    AND cs.status = 1
+                    AND cs.score IS NOT NULL
+                )
+            END AS totalStudents
+        FROM 
+            student s
+        INNER JOIN 
+            sys_user u ON s.user_id = u.id
+        LEFT JOIN 
+            course_selection g ON s.id = g.student_id
+        LEFT JOIN 
+            course_offering co ON g.course_offering_id = co.id
+        LEFT JOIN 
+            course c ON co.course_id = c.id
+        WHERE 
+            u.id = #{studentId}
+            <if test="courseName != null and courseName != ''">
+                AND c.name LIKE CONCAT('%', #{courseName}, '%')
+            </if>
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+            <if test="status != null">
+                AND g.status = #{status}
+            </if>
+            AND (g.status != 2 OR g.status IS NULL)
+        ORDER BY co.semester DESC, c.code
+    </select>
+
+    <!-- 查询学生所有成绩（不分页） -->
+    <select id="selectAllStudentGrades" resultType="java.util.Map">
+        SELECT 
+            g.id,
+            g.student_id,
+            u.name AS student_name,
+            co.course_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit AS credits,
+            c.type AS course_type,
+            co.semester,
+            g.score,
+            g.status,
+            g.create_time,
+            g.update_time,
+            DATE_FORMAT(co.exam_time, '%Y-%m-%d %H:%i') AS examTime,
+            CASE
+                WHEN g.score IS NULL THEN NULL
+                ELSE (
+                    SELECT COUNT(*) + 1
+                    FROM course_selection cs
+                    JOIN course_offering co2 ON cs.course_offering_id = co2.id
+                    WHERE co2.course_id = co.course_id 
+                    AND co2.semester = co.semester
+                    AND cs.score > g.score
+                    AND cs.status = 1
+                )
+            END AS ranking,
+            CASE
+                WHEN g.score IS NULL THEN NULL
+                ELSE (
+                    SELECT COUNT(*)
+                    FROM course_selection cs
+                    JOIN course_offering co2 ON cs.course_offering_id = co2.id
+                    WHERE co2.course_id = co.course_id 
+                    AND co2.semester = co.semester
+                    AND cs.status = 1
+                    AND cs.score IS NOT NULL
+                )
+            END AS totalStudents
+        FROM 
+            student s
+        INNER JOIN 
+            sys_user u ON s.user_id = u.id
+        LEFT JOIN 
+            course_selection g ON s.id = g.student_id
+        LEFT JOIN 
+            course_offering co ON g.course_offering_id = co.id
+        LEFT JOIN 
+            course c ON co.course_id = c.id
+        WHERE 
+            u.id = #{studentId}
+            AND (g.status != 2 OR g.status IS NULL)
+        ORDER BY co.semester DESC, c.code
+    </select>
+
+    <!-- 查询学生成绩统计数据 -->
+    <select id="selectStudentGradeStats" resultType="java.util.Map">
+        SELECT 
+            COUNT(g.id) AS totalCourses,
+            SUM(c.credit) AS totalCredits,
+            IFNULL(ROUND(AVG(g.score), 2), 0) AS averageScore
+        FROM 
+            student s
+        INNER JOIN 
+            sys_user u ON s.user_id = u.id
+        LEFT JOIN 
+            course_selection g ON s.id = g.student_id
+        LEFT JOIN 
+            course_offering co ON g.course_offering_id = co.id
+        LEFT JOIN 
+            course c ON co.course_id = c.id
+        WHERE 
+            u.id = #{studentId}
+            AND (g.status != 2 OR g.status IS NULL)
+    </select>
+
+    <!-- 查询学生各学期成绩统计 -->
+    <select id="selectStudentSemesterStats" resultType="java.util.Map">
+        SELECT 
+            co.semester,
+            COUNT(g.id) AS courseCount,
+            IFNULL(ROUND(AVG(g.score), 2), 0) AS averageScore,
+            SUM(c.credit) AS totalCredits
+        FROM 
+            student s
+        INNER JOIN 
+            sys_user u ON s.user_id = u.id
+        LEFT JOIN 
+            course_selection g ON s.id = g.student_id
+        LEFT JOIN 
+            course_offering co ON g.course_offering_id = co.id
+        LEFT JOIN 
+            course c ON co.course_id = c.id
+        WHERE 
+            u.id = #{studentId}
+            AND (g.status != 2 OR g.status IS NULL)
+        GROUP BY co.semester
+        ORDER BY co.semester DESC
+    </select>
+
+    <!-- 查询学生成绩分布 -->
+    <select id="selectStudentGradeDistribution" resultType="java.util.Map">
+        SELECT 
+            CASE 
+                WHEN g.score >= 90 THEN 'A (90-100)'
+                WHEN g.score >= 80 THEN 'B (80-89)'
+                WHEN g.score >= 70 THEN 'C (70-79)'
+                WHEN g.score >= 60 THEN 'D (60-69)'
+                ELSE 'F (0-59)'
+            END AS grade_level,
+            COUNT(*) AS count
+        FROM 
+            student s
+        INNER JOIN
+            sys_user u ON s.user_id = u.id
+        LEFT JOIN 
+            course_selection g ON s.id = g.student_id
+        WHERE 
+            u.id = #{studentId}
+            AND (g.status != 2 OR g.status IS NULL)
+            AND g.score IS NOT NULL
+        GROUP BY grade_level
+        ORDER BY MIN(g.score) DESC
+    </select>
+
+    <!-- 查询学生选课记录（包括未公布成绩的） -->
+    <select id="selectStudentCourseSelections" resultType="java.util.Map">
+        SELECT 
+            g.id,
+            g.student_id,
+            g.course_offering_id,
+            u.name AS student_name,
+            co.course_id,
+            c.name AS course_name,
+            c.code AS course_code,
+            c.credit AS credits,
+            c.type AS course_type,
+            co.semester,
+            co.class_time,
+            co.location,
+            g.score,
+            g.status,
+            g.create_time,
+            g.update_time,
+            t.id AS teacher_id,
+            tu.name AS teacher_name,
+            DATE_FORMAT(co.exam_time, '%Y-%m-%d %H:%i') AS examTime,
+            CASE 
+                WHEN g.status = 0 THEN '待评分'
+                WHEN g.status = 1 THEN '已评分'
+                WHEN g.status = 2 THEN '已取消'
+                ELSE '未知'
+            END AS status_text,
+            CASE
+                WHEN g.score IS NULL THEN NULL
+                ELSE (
+                    SELECT COUNT(*) + 1
+                    FROM course_selection cs
+                    JOIN course_offering co2 ON cs.course_offering_id = co2.id
+                    WHERE co2.course_id = co.course_id 
+                    AND co2.semester = co.semester
+                    AND cs.score > g.score
+                    AND cs.status = 1
+                )
+            END AS ranking,
+            CASE
+                WHEN g.score IS NULL THEN NULL
+                ELSE (
+                    SELECT COUNT(*)
+                    FROM course_selection cs
+                    JOIN course_offering co2 ON cs.course_offering_id = co2.id
+                    WHERE co2.course_id = co.course_id 
+                    AND co2.semester = co.semester
+                    AND cs.status = 1
+                    AND cs.score IS NOT NULL
+                )
+            END AS totalStudents
+        FROM 
+            student s
+        INNER JOIN
+            sys_user u ON s.user_id = u.id
+        LEFT JOIN 
+            course_selection g ON s.id = g.student_id
+        LEFT JOIN 
+            course_offering co ON g.course_offering_id = co.id
+        LEFT JOIN 
+            course c ON co.course_id = c.id
+        LEFT JOIN
+            teacher t ON co.teacher_id = t.id
+        LEFT JOIN
+            sys_user tu ON t.user_id = tu.id
+        WHERE 
+            u.id = #{studentId}
+            <if test="courseName != null and courseName != ''">
+                AND c.name LIKE CONCAT('%', #{courseName}, '%')
+            </if>
+            <if test="semester != null and semester != ''">
+                AND co.semester = #{semester}
+            </if>
+            <if test="status != null">
+                AND g.status = #{status}
+            </if>
+            AND (g.status != 2 OR g.status IS NULL)
+        ORDER BY co.semester DESC, c.code
+    </select>
+
+</mapper> 

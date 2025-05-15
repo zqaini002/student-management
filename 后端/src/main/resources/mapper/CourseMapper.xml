@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.student.mapper.CourseMapper">
+    
+    <resultMap id="BaseResultMap" type="com.example.student.entity.Course">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="code" property="code" />
+        <result column="credit" property="credit" />
+        <result column="hours" property="hours" />
+        <result column="type" property="type" />
+        <result column="department_id" property="departmentId" />
+        <result column="description" property="description" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <!-- 查询课程详情 -->
+    <select id="selectCourseById" parameterType="java.lang.Long" resultType="com.example.student.entity.Course">
+        SELECT *
+        FROM course
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 分页查询课程列表 -->
+    <select id="selectCourseList" resultType="com.example.student.entity.Course">
+        SELECT *
+        FROM course
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 查询各学期的课程数量统计（包括新开课程和结课课程） -->
+    <select id="selectCourseBySemester" resultType="java.util.Map">
+        SELECT semester, 
+               COUNT(id) AS totalCourses, 
+               SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) AS finishedCourses 
+        FROM course_offering 
+        GROUP BY semester 
+        ORDER BY semester
+    </select>
+    
+    <!-- 按院系统计课程数量 -->
+    <select id="selectCourseCountByDepartment" resultType="java.util.Map">
+        SELECT d.id as departmentId, d.name as departmentName, 
+               COUNT(c.id) as courseCount, 
+               SUM(CASE WHEN c.type = 0 THEN 1 ELSE 0 END) as requiredCourseCount, 
+               SUM(CASE WHEN c.type = 1 THEN 1 ELSE 0 END) as electiveCourseCount 
+        FROM course c 
+        LEFT JOIN department d ON c.department_id = d.id 
+        GROUP BY d.id, d.name 
+        ORDER BY courseCount DESC
+    </select>
+    
+    <!-- 查询课程选项列表 -->
+    <select id="selectCourseOptions" resultType="java.util.Map">
+        SELECT
+            c.id as value,
+            CONCAT(c.name, ' (', c.code, ')') as label
+        FROM
+            course c
+        ORDER BY
+            c.name
+    </select>
+    
+    <!-- 查询考勤记录模块可用的课程列表 -->
+    <select id="selectCoursesForAttendance" resultType="com.example.student.entity.Course">
+        SELECT 
+            c.*
+        FROM 
+            course c
+        LEFT JOIN 
+            course_offering co ON c.id = co.course_id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                (
+                    c.name LIKE CONCAT('%', #{keyword}, '%')
+                    OR c.code LIKE CONCAT('%', #{keyword}, '%')
+                    OR c.description LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+        </where>
+        GROUP BY c.id
+        ORDER BY c.create_time DESC
+    </select>
+    
+    <!-- 按学分分布统计课程 -->
+    <select id="selectCreditDistribution" resultType="java.util.Map">
+        SELECT 
+            credit,
+            COUNT(*) as count
+        FROM 
+            course
+        GROUP BY 
+            credit
+        ORDER BY 
+            credit
+    </select>
+    
+    <!-- 根据开课院系ID查询课程列表 -->
+    <select id="selectCoursesByDepartmentId" resultMap="BaseResultMap">
+        SELECT 
+            *
+        FROM 
+            course
+        WHERE 
+            department_id = #{departmentId}
+    </select>
+    
+    <!-- 查询课程详情 -->
+    <select id="selectCourseDetailById" resultType="java.util.Map">
+        SELECT 
+            c.id,
+            c.code,
+            c.name,
+            c.type,
+            c.credit,
+            c.hours,
+            c.description,
+            c.department_id,
+            d.name AS department_name,
+            c.create_time,
+            c.update_time,
+            t.id AS teacher_id,
+            u.name AS teacher_name,
+            u.phone AS teacher_contact,
+            co.semester,
+            co.class_time,
+            co.location,
+            co.status,
+            CASE 
+                WHEN co.status = 0 THEN '未开始'
+                WHEN co.status = 1 THEN '进行中'
+                WHEN co.status = 2 THEN '已结束'
+                ELSE '未知状态'
+            END AS status_desc,
+            co.capacity,
+            co.selected_count
+        FROM 
+            course c
+        LEFT JOIN 
+            department d ON c.department_id = d.id
+        LEFT JOIN 
+            course_offering co ON co.course_id = c.id
+        LEFT JOIN 
+            teacher t ON co.teacher_id = t.id
+        LEFT JOIN 
+            sys_user u ON t.user_id = u.id
+        WHERE 
+            c.id = #{courseId}
+        LIMIT 1
+    </select>
+    
+    <!-- 查询课程教材信息 -->
+    <select id="selectCourseMaterialsById" resultType="java.util.Map">
+        SELECT 
+            m.id,
+            m.name,
+            m.author,
+            m.publisher,
+            m.publish_date,
+            m.price,
+            m.isbn,
+            m.description,
+            m.is_required,
+            m.create_time,
+            m.update_time
+        FROM 
+            course_material cm
+        INNER JOIN 
+            material m ON cm.material_id = m.id
+        WHERE 
+            cm.course_id = #{courseId}
+        ORDER BY 
+            m.is_required DESC, m.name ASC
+    </select>
+    
+</mapper> 
