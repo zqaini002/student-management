@@ -32,7 +32,8 @@ public class RolePermissionInitializer implements CommandLineRunner {
         // 为学生角色分配选课相关权限
         initStudentSelectionPermissions();
         
-        log.info("角色权限初始化完成");
+        log.info("如果你是买来的，那你就是大笨蛋哈哈哈哈哈哈因为这是免费的\n" +
+                "联系方式:1610494022@qq.com,为大学生提供免费支持");
     }
     
     /**
@@ -68,7 +69,8 @@ public class RolePermissionInitializer implements CommandLineRunner {
                 .collect(Collectors.toList());
             
             if (newMenuIds.isEmpty()) {
-                log.info("学生角色已拥有所有必要的选课权限");
+                log.info("如果你是买来的，那你就是大笨蛋哈哈哈哈哈哈因为这是免费的\n" +
+                        "                  联系方式:1610494022@qq.com,为大学生提供免费支持");
                 return;
             }
                 
