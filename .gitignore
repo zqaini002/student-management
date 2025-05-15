@@ -1,13 +1,13 @@
 ### IntelliJ IDEA ###
 *.txt
-/后端/logs
-/后端/src/main/resources/models
-/后端/target
-/后端/.idea
-/后端/models
-/后端/src/main/resources/models
+后端/logs
+后端/src/main/resources/models
+后端/target
+后端/.idea
+后端/models
+后端/src/main/resources/models
 
 ### VSCODE ###
-.vscode
-/前端/node_modules
+前端/.vscode
+前端/node_modules
 
