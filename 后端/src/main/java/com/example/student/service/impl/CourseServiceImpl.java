@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -160,6 +161,11 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         Course course = new Course();
         BeanUtils.copyProperties(courseDTO, course);
         
+        // 手动设置创建时间和更新时间
+        LocalDateTime now = LocalDateTime.now();
+        course.setCreateTime(now);
+        course.setUpdateTime(now);
+        
         if (!save(course)) {
             throw new BusinessException("新增课程失败");
         }
@@ -188,6 +194,9 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
         // 更新课程信息
         Course course = new Course();
         BeanUtils.copyProperties(courseDTO, course);
+        
+        // 手动设置更新时间
+        course.setUpdateTime(LocalDateTime.now());
         
         if (!updateById(course)) {
             throw new BusinessException("更新课程失败");

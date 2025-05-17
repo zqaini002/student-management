@@ -6,7 +6,7 @@
         <el-avatar :size="64" :src="avatar" class="user-avatar" />
         <div class="welcome-text">
           <h1>{{ welcomeText }}</h1>
-          <p>欢迎回到学生信息管理系统</p>
+          <p>欢迎回到EduSmart 高校智能管理平台</p>
         </div>
       </div>
       <div class="current-time">

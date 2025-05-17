@@ -340,7 +340,7 @@ const submitForm = async () => {
         ElMessage.success('学生添加成功')
         
         // 返回列表页
-        router.push('/student/list')
+        router.push('/student-list')
       } catch (error) {
         console.error('添加学生失败:', error)
         ElMessage.error(error.response?.data?.message || '添加学生失败')
@@ -380,7 +380,7 @@ const submitForm = async () => {
 
 // 返回上一页
 const goBack = () => {
-  router.go(-1)
+  router.push('/student-list')
 }
 </script>
 

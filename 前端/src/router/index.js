@@ -92,6 +92,34 @@ export const constantRoutes = [
       }
     ]
   },
+  // 添加课程列表路由
+  {
+    path: '/course',
+    component: Layout,
+    children: [
+      {
+        path: 'list',
+        name: 'CourseList',
+        component: loadView('course/index'),
+        meta: { title: '课程列表' }
+      }
+    ],
+    hidden: true
+  },
+  // 添加课程新增路由
+  {
+    path: '/course-add',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'CourseAdd',
+        component: loadView('course/add'),
+        meta: { title: '新增课程' }
+      }
+    ],
+    hidden: true
+  },
   // 添加一个通用错误页
   {
     path: '/error',
@@ -268,6 +296,10 @@ export const asyncRoutes = [
         component: loadView('course/offering/index'),
         meta: { title: '课程开设记录', icon: 'Notebook', roles: ['admin', 'teacher'] }
       },
+      {
+        path: '',
+        redirect: 'list'
+      }
     ]
   },
   
@@ -446,6 +478,17 @@ router.beforeEach(async (to, from, next) => {
   console.log('-------路由守卫开始-------')
   console.log('从路由:', from.path, '跳转到:', to.path)
   console.log('目标路由完整信息:', to)
+  
+  // 特殊处理课程列表路由
+  if (to.path === '/course/list' && to.name !== 'CourseList') {
+    console.log('检测到访问/course/list路径，进行特殊处理')
+    // 标准化路由，确保能找到对应组件
+    return next({ 
+      path: '/course',
+      name: 'CourseList',
+      replace: true
+    })
+  }
   
   // 获取Token
   const hasToken = getToken()

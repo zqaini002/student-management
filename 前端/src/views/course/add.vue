@@ -274,7 +274,11 @@ const submitForm = async () => {
         await addCourse(form)
         ElMessage.success('新增课程成功')
         // 跳转到课程列表页面
-        router.push('/course/list')
+        router.push({ 
+          path: '/course', 
+          name: 'CourseList',
+          replace: true 
+        })
       } catch (err) {
         console.error('新增课程失败:', err)
         ElMessage.error(err.response?.data?.message || '新增课程失败')
@@ -288,7 +292,11 @@ const submitForm = async () => {
 // 取消表单提交
 const cancel = () => {
   ElMessage.info('已取消新增')
-  router.push('/course/list')
+  router.push({ 
+    path: '/course', 
+    name: 'CourseList',
+    replace: true 
+  })
 }
 </script>
 

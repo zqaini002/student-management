@@ -2,7 +2,7 @@
   <div class="logo-container">
     <router-link to="/" class="logo-link">
       <img src="@/assets/logo.png" class="logo-image" alt="系统logo">
-      <h1 class="logo-title" v-if="!isCollapsed">高校学生信息管理系统</h1>
+      <h1 class="logo-title" v-if="!isCollapsed">高校智能管理平台</h1>
     </router-link>
   </div>
 </template>

@@ -24,6 +24,8 @@ export const manualComponentMap = {
   'course/index': CourseList,
   'course/index.vue': CourseList,
   'course/list': CourseList,
+  '/course/list': CourseList,
+  './course/list': CourseList,
   
   // 教师管理组件
   'teacher/add': TeacherAdd,
@@ -51,7 +53,8 @@ export function getManualComponent(path) {
   if (!path) return null
   
   // 标准化路径
-  const normalizedPath = path.replace(/\.vue$/, '')
+  const normalizedPath = path.replace(/\.vue$/, '').replace(/^\//, '')
+  console.log(`[手动映射] 请求路径: ${path}, 标准化路径: ${normalizedPath}`)
   
   // 特殊处理dashboard路径
   if (normalizedPath === 'dashboard' || normalizedPath === 'dashboard/index') {
@@ -65,9 +68,29 @@ export function getManualComponent(path) {
     return manualComponentMap['teacher/add'] || null
   }
   
-  return manualComponentMap[normalizedPath] || 
-         manualComponentMap[path] || 
-         null
+  // 特殊处理course/list路径
+  if (normalizedPath === 'course/list') {
+    console.log(`[手动映射] 特殊处理 course/list 路径`)
+    return manualComponentMap['course/list'] || manualComponentMap['course/index'] || null
+  }
+  
+  // 依次尝试不同的路径格式
+  const possiblePaths = [
+    normalizedPath,
+    normalizedPath.replace(/^\//, ''),  // 移除开头的斜杠
+    normalizedPath + '.vue',
+    normalizedPath + '/index'
+  ]
+  
+  for (const tryPath of possiblePaths) {
+    if (manualComponentMap[tryPath]) {
+      console.log(`[手动映射] 找到匹配路径: ${tryPath}`)
+      return manualComponentMap[tryPath]
+    }
+  }
+  
+  console.log(`[手动映射] 未找到匹配组件: ${path}`)
+  return null
 }
 
 export default {

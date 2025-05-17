@@ -388,7 +388,7 @@ const submitForm = async () => {
           activeTab.value = 'basic'
         } catch (err) {
           // 用户选择返回列表
-          router.push('/teacher/list')
+          router.push('/teacher-list')
         }
       } catch (err) {
         console.error('添加教师失败:', err)
@@ -412,7 +412,7 @@ const submitForm = async () => {
 
 // 返回列表页
 const goBack = () => {
-  router.push('/teacher/list')
+  router.push('/teacher-list')
 }
 </script>
 

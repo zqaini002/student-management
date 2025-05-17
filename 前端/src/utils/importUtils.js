@@ -90,6 +90,8 @@ export function normalizePath(path) {
   // 标准化Windows路径分隔符
   normalized = normalized.replace(/\\/g, '/')
   
+  console.log(`规范化路径: ${path} -> ${normalized}`)
+  
   return normalized
 }
 
@@ -212,6 +214,13 @@ export function loadComponent(path) {
   return () => {
     console.log(`统一加载器加载组件: ${path}`)
     
+    // 对course/list路径进行特殊处理
+    if (path === 'course/list' || path === '/course/list') {
+      console.log('检测到course/list路径，进行特殊处理')
+      const CourseList = require('@/views/course/index.vue').default
+      return Promise.resolve(CourseList)
+    }
+    
     // 优先检查是否有手动映射的组件
     try {
       // 动态导入手动映射组件
@@ -230,6 +239,10 @@ export function loadComponent(path) {
     // 这样Vite/Webpack可以正确解析所有可能的导入
     const modules = import.meta.glob('../views/**/*.vue')
     
+    // 对路径进行规范化
+    const normalizedPath = normalizePath(path)
+    console.log(`加载组件，规范化后路径: ${normalizedPath}`)
+    
     // 特殊处理message相关的路径
     if (path.includes('message')) {
       console.log('正在加载message相关组件:', path)
@@ -240,9 +253,9 @@ export function loadComponent(path) {
     }
     
     // 尝试直接模式 (xxx.vue)
-    const directPath = `../views/${path}.vue`
+    const directPath = `../views/${normalizedPath}.vue`
     // 尝试索引模式 (xxx/index.vue)
-    const indexPath = `../views/${path}/index.vue`
+    const indexPath = `../views/${normalizedPath}/index.vue`
     // 尝试消息特定路径
     const messagePath = path.startsWith('message/') 
       ? `../views/message/${path.split('/')[1]}/index.vue` 

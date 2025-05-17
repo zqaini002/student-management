@@ -1,4 +1,4 @@
-# 🎓 学生信息管理系统 - 后端
+# 🎓 学生信息管理系统
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1.5-6DB33F?logo=spring-boot)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-orange.svg)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 
-> 基于Spring Boot + Spring Security + JWT + MyBatis-Plus的完整学生信息管理系统
+> 2025大三下帮助室友完成他的作业手搓完成的基于Spring Boot + Spring Security + JWT + MyBatis-Plus的完整学生信息管理系统
 
 ## 📑 目录
 
@@ -24,7 +24,7 @@
 - [开发团队](#-开发团队)
 
 ## 📋 项目介绍
-本项目是一个基于Spring Boot + Spring Security + JWT + MyBatis-Plus的学生信息管理系统后端，提供完整的学生信息管理功能，包括用户认证、学生管理、课程管理、成绩管理等。
+本项目是一个基于Spring Boot + Spring Security + JWT + MyBatis-Plus的学生信息管理系统，提供完整的学生信息管理功能，包括用户认证、学生管理、课程管理、成绩管理等。
 
 ## 🔧 技术栈
 - 🍃 Spring Boot 3.1.5
@@ -87,7 +87,7 @@ student-management-system
    - 🛡️ 密码加密存储
    - 📝 登录日志记录
    - 🚨 异常登录检测
-   
+
 ### 2️⃣ 学生管理
    - 📝 学生信息CRUD
    - 🔍 学生分页查询与筛选
@@ -99,7 +99,7 @@ student-management-system
    - 🔎 多维度学生查询（按班级、专业、年级等）
    - ✅ 学生信息校验机制
    - 🔗 学生账号关联管理
-   
+
 ### 3️⃣ 教师管理
    - 📝 教师信息CRUD
    - 🔍 教师分页查询
@@ -111,7 +111,7 @@ student-management-system
    - ⏱️ 教师课时统计
    - 🌟 教师考评管理
    - 🏢 部门与职称管理
-   
+
 ### 4️⃣ 班级管理
    - 📝 班级信息CRUD
    - 👨‍👩‍👧‍👦 班级学生管理
@@ -123,7 +123,7 @@ student-management-system
    - 📊 班级学生异动记录
    - 📢 班级公告管理
    - 🎯 班级活动记录
-   
+
 ### 5️⃣ 课程管理
    - 📝 课程信息CRUD
    - 📋 课程选课管理
@@ -136,7 +136,7 @@ student-management-system
    - 🔢 课程容量控制
    - 🔄 先修课程关联
    - 🔀 跨专业选课支持
-   
+
 ### 6️⃣ 成绩管理
    - 📝 成绩录入与修改
    - 📊 成绩统计与分析
@@ -150,7 +150,7 @@ student-management-system
    - 🔢 学分绩点换算
    - 📉 成绩趋势分析
    - 📊 成绩分布图表显示
-   
+
 ### 7️⃣ 考勤管理
    - 📝 考勤记录添加与查询
    - 📊 考勤统计分析（出勤率、缺勤率等）
@@ -162,13 +162,13 @@ student-management-system
    - 📊 教师可批量录入考勤
    - 👤 支持单个学生考勤记录维护
    - 📝 考勤记录备注功能
-   
+
 ### 8️⃣ 系统管理
    - 👥 用户管理
    - 👑 角色管理
    - 📋 菜单管理
    - 🔒 权限管理
-   
+
 ### 9️⃣ 通知公告
    - 📢 发布通知
    - 👁️ 查看通知
@@ -271,6 +271,8 @@ student-management-system
 - 🔧 修复了用户头像上传后不显示问题：调整了文件保存路径和访问URL配置
 - 🔧 修复了教师查看课程学生列表分页问题：完善了分页参数处理
 - 🔧 解决了Excel导入学生信息时的数据校验问题：增强了数据格式验证
+- 🔧 修复了学生管理页面新增按钮跳转问题：统一路由格式，将'/student/add'改为'/student-add'，确保路径一致性
+- 🔧 修复了教师管理新增页面返回按钮跳转问题：统一路由格式，将'/teacher/list'改为'/teacher-list'，解决了页面跳转404问题
 
 ### 5. Knife4j文档访问
 - 📚 访问地址：http://localhost:8080/api/doc.html

@@ -5,7 +5,7 @@
       <el-card class="login-card">
         <!-- 标题 -->
         <div class="title-container">
-          <h3 class="title">高校学生信息管理系统</h3>
+          <h3 class="title">EduSmart 高校智能管理平台</h3>
         </div>
         
         <!-- 登录表单 -->
@@ -76,7 +76,7 @@
       
       <!-- 版权信息 -->
       <div class="copyright">
-        © {{ new Date().getFullYear() }} 高校学生信息管理系统
+        © {{ new Date().getFullYear() }} EduSmart 高校智能管理平台
       </div>
     </div>
     

@@ -29,8 +29,8 @@ router.beforeEach(async (to, from, next) => {
   
   // 设置页面标题
   document.title = to.meta.title 
-    ? `${to.meta.title} - 高校学生信息管理系统` 
-    : '高校学生信息管理系统'
+    ? `${to.meta.title} - EduSmart 高校智能管理平台` 
+    : 'EduSmart 高校智能管理平台'
   
   // 获取Token
   const hasToken = getToken()

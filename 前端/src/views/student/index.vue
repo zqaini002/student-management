@@ -769,7 +769,7 @@ const handleSizeChange = (pageSize) => {
 
 // 新增按钮
 const handleAdd = () => {
-  router.push('/student/add')
+  router.push('/student-add')
 }
 
 // 编辑按钮
