@@ -170,6 +170,26 @@ public class TeacherController {
     }
     
     /**
+     * 获取课程学生列表（支持管理员访问）
+     *
+     * @param courseId  课程ID
+     * @param queryDTO  查询条件，包含可选的teacherId
+     * @return 学生分页数据
+     */
+    @Operation(summary = "获取课程学生列表", description = "获取课程学生列表接口，支持管理员直接访问")
+    @PreAuthorize("@ss.hasAnyRole('admin', 'teacher')")
+    @PostMapping("/courses/students/{courseId}")
+    public Result<PageResult<?>> getCourseStudentsNew(
+            @Parameter(description = "课程ID") @PathVariable Long courseId,
+            @Valid @RequestBody TeacherQueryDTO queryDTO) {
+        // 从查询DTO中获取teacherId
+        Long teacherId = queryDTO.getTeacherId();
+        // 调用相同的服务方法，处理逻辑不变
+        PageResult<?> pageResult = teacherService.getTeacherCourseStudents(teacherId, courseId, queryDTO);
+        return Result.success(pageResult);
+    }
+    
+    /**
      * 提交学生成绩
      *
      * @param teacherId 教师ID
@@ -204,6 +224,23 @@ public class TeacherController {
             @Parameter(description = "课程ID") @PathVariable Long courseId,
             @RequestBody Map<String, Object> data) {
         boolean result = teacherService.submitStudentAttendance(teacherId, courseId, data);
+        return Result.success(result);
+    }
+    
+    /**
+     * 管理员提交学生考勤（无教师ID）
+     *
+     * @param courseId 课程ID
+     * @param data 考勤数据
+     * @return 操作结果
+     */
+    @Operation(summary = "管理员提交学生考勤", description = "管理员提交学生考勤接口")
+    @PreAuthorize("@ss.hasAnyRole('admin')")
+    @PutMapping("/courses/attendance/{courseId}")
+    public Result<Boolean> submitAttendanceByAdmin(
+            @Parameter(description = "课程ID") @PathVariable Long courseId,
+            @RequestBody Map<String, Object> data) {
+        boolean result = teacherService.submitStudentAttendance(null, courseId, data);
         return Result.success(result);
     }
     

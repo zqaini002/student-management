@@ -49,17 +49,12 @@
     
     <!-- 教师课程学生视图对象结果映射 -->
     <resultMap id="TeacherCourseStudentVOResultMap" type="com.example.student.vo.TeacherCourseStudentVO">
-        <id property="id" column="id"/>
+        <id property="courseSelectionId" column="id"/>
         <result property="studentId" column="student_id"/>
         <result property="studentNo" column="student_no"/>
-        <result property="studentName" column="student_name"/>
-        <result property="classId" column="class_id"/>
+        <result property="name" column="student_name"/>
         <result property="className" column="class_name"/>
         <result property="majorName" column="major_name"/>
-        <result property="departmentName" column="department_name"/>
-        <result property="gender" column="gender"/>
-        <result property="genderDesc" column="gender_desc"/>
-        <result property="selectionTime" column="selection_time"/>
         <result property="score" column="score"/>
         <result property="status" column="status"/>
         <result property="statusDesc" column="status_desc"/>
@@ -67,6 +62,14 @@
         <result property="lastAttendanceStatus" column="last_attendance_status"/>
         <result property="lastAttendanceDate" column="last_attendance_date"/>
         <result property="lastAttendanceDesc" column="last_attendance_desc"/>
+        <collection property="attendanceRecords" ofType="com.example.student.vo.AttendanceRecordVO">
+            <id property="id" column="attendance_id"/>
+            <result property="date" column="attendance_date"/>
+            <result property="status" column="attendance_status"/>
+            <result property="remark" column="attendance_remark"/>
+            <result property="courseOfferingId" column="course_offering_id"/>
+            <result property="studentId" column="student_id"/>
+        </collection>
     </resultMap>
     
     <!-- 分页查询教师列表 -->
@@ -236,7 +239,7 @@
                 WHEN 2 THEN '已修完' 
             END AS status_desc,
             (
-                SELECT COUNT(CASE WHEN a.status = 0 THEN 1 END) * 100.0 / COUNT(*) 
+                SELECT COUNT(CASE WHEN a.status = 0 THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0)
                 FROM attendance a 
                 WHERE a.student_id = s.id AND a.course_offering_id = #{courseId}
             ) AS attendance_rate,
@@ -267,7 +270,12 @@
                 WHERE a.student_id = s.id AND a.course_offering_id = #{courseId} 
                 ORDER BY a.attendance_date DESC 
                 LIMIT 1
-            ) AS last_attendance_desc
+            ) AS last_attendance_desc,
+            a.id AS attendance_id,
+            a.attendance_date,
+            a.status AS attendance_status,
+            a.remark AS attendance_remark,
+            a.course_offering_id
         FROM
             course_selection cs
         JOIN
@@ -280,8 +288,13 @@
             major m ON cl.major_id = m.id
         JOIN
             department d ON m.department_id = d.id
+        LEFT JOIN
+            attendance a ON cs.student_id = a.student_id AND a.course_offering_id = #{courseId}
         WHERE
             cs.course_offering_id = #{courseId}
+            <if test="studentId != null">
+                AND s.id = #{studentId}
+            </if>
             <if test="studentName != null and studentName != ''">
                 AND u.name LIKE CONCAT('%', #{studentName}, '%')
             </if>

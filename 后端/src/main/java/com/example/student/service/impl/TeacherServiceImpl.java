@@ -249,20 +249,42 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
     @Override
     public PageResult<?> getTeacherCourseStudents(Long teacherId, Long courseId, TeacherQueryDTO queryDTO) {
-        // 检查教师是否有权限操作课程
-        int count = teacherMapper.checkTeacherCoursePermission(teacherId, courseId);
-        if (count == 0) {
-            throw new BusinessException("没有权限操作该课程");
+        // 检查权限：
+        // 1. 如果teacherId为null，视为管理员访问，无需权限检查
+        // 2. 如果有teacherId，检查该教师是否有权限操作这个课程
+        if (teacherId != null) {
+            int count = teacherMapper.checkTeacherCoursePermission(courseId, teacherId);
+            if (count == 0) {
+                log.warn("教师 {} 没有权限操作课程 {}", teacherId, courseId);
+                throw new BusinessException("没有权限操作该课程");
+            }
+        } else {
+            // teacherId为null且courseId为null，参数错误
+            if (courseId == null) {
+                log.error("参数错误: teacherId和courseId都为空");
+                throw new BusinessException("参数不完整：缺少courseId");
+            }
+            // teacherId为null，作为管理员访问处理
+            log.info("管理员用户访问课程学生列表: courseId={}", courseId);
         }
 
         // 创建分页对象
         Page<TeacherCourseStudentVO> page = new Page<>(queryDTO.getPageNum(), queryDTO.getPageSize());
+        
+        // 从查询DTO中获取studentId
+        Long studentId = queryDTO.getStudentId();
+        if (studentId != null) {
+            log.info("查询单个学生详细考勤记录: studentId={}, courseId={}", studentId, courseId);
+        }
+        
         // 查询数据
         IPage<TeacherCourseStudentVO> result = teacherMapper.selectTeacherCourseStudentPage(page,
                 courseId,
                 queryDTO.getStudentName(),
                 queryDTO.getStudentNo(),
-                queryDTO.getStatus());
+                queryDTO.getStatus(),
+                studentId);
+                
         // 返回结果
         return PageResult.build(result.getRecords(), result.getTotal(), queryDTO.getPageNum(), queryDTO.getPageSize());
     }
@@ -297,47 +319,70 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean submitStudentAttendance(Long teacherId, Long courseId, Map<String, Object> data) {
-        // 检查教师是否有权限操作课程
-        int count = teacherMapper.checkTeacherCoursePermission(teacherId, courseId);
-        if (count == 0) {
-            throw new BusinessException("没有权限操作该课程");
+        // 检查权限：
+        // 1. 如果teacherId为null，视为管理员访问，无需权限检查
+        // 2. 如果有teacherId，检查该教师是否有权限操作这个课程
+        if (teacherId != null) {
+            int count = teacherMapper.checkTeacherCoursePermission(courseId, teacherId);
+            if (count == 0) {
+                log.warn("教师 {} 没有权限操作课程 {}", teacherId, courseId);
+                throw new BusinessException("没有权限操作该课程");
+            }
+        } else {
+            // teacherId为null且courseId为null，参数错误
+            if (courseId == null) {
+                log.error("参数错误: teacherId和courseId都为空");
+                throw new BusinessException("参数不完整：缺少courseId");
+            }
+            // teacherId为null，作为管理员访问处理
+            log.info("管理员用户提交考勤记录: courseId={}", courseId);
         }
 
         try {
-            // 获取学生ID、考勤日期和状态
-            Long studentId = Long.valueOf(data.get("studentId").toString());
-            String attendanceDateStr = data.get("attendanceDate").toString();
-            Integer status = Integer.valueOf(data.get("status").toString());
-            String remark = data.get("remark") != null ? data.get("remark").toString() : null;
-
-            // 解析考勤日期
-            LocalDate attendanceDate = LocalDate.parse(attendanceDateStr);
-
-            // 查询是否已有考勤记录
-            LambdaQueryWrapper<Attendance> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(Attendance::getCourseOfferingId, courseId)
-                    .eq(Attendance::getStudentId, studentId)
-                    .eq(Attendance::getAttendanceDate, attendanceDate);
-
-            Attendance attendance = attendanceMapper.selectOne(queryWrapper);
-
-            // 如果已有记录，则更新；否则，新增
-            if (attendance != null) {
-                attendance.setStatus(status);
-                attendance.setRemark(remark);
-                return attendanceMapper.updateById(attendance) > 0;
-            } else {
-                attendance = new Attendance();
-                attendance.setCourseOfferingId(courseId);
-                attendance.setStudentId(studentId);
-                attendance.setAttendanceDate(attendanceDate);
-                attendance.setStatus(status);
-                attendance.setRemark(remark);
-                return attendanceMapper.insert(attendance) > 0;
+            // 获取考勤日期
+            String dateStr = data.get("date").toString();
+            LocalDate attendanceDate = LocalDate.parse(dateStr);
+            
+            // 获取考勤记录列表
+            List<Map<String, Object>> records = (List<Map<String, Object>>) data.get("records");
+            if (records == null || records.isEmpty()) {
+                throw new BusinessException("考勤记录不能为空");
             }
+            
+            // 批量处理考勤记录
+            for (Map<String, Object> record : records) {
+                Long studentId = Long.valueOf(record.get("studentId").toString());
+                Integer status = Integer.valueOf(record.get("status").toString());
+                String remark = record.get("remark") != null ? record.get("remark").toString() : null;
+                
+                // 查询是否已有考勤记录
+                LambdaQueryWrapper<Attendance> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.eq(Attendance::getCourseOfferingId, courseId)
+                        .eq(Attendance::getStudentId, studentId)
+                        .eq(Attendance::getAttendanceDate, attendanceDate);
+                
+                Attendance attendance = attendanceMapper.selectOne(queryWrapper);
+                
+                // 如果已有记录，则更新；否则，新增
+                if (attendance != null) {
+                    attendance.setStatus(status);
+                    attendance.setRemark(remark);
+                    attendanceMapper.updateById(attendance);
+                } else {
+                    attendance = new Attendance();
+                    attendance.setCourseOfferingId(courseId);
+                    attendance.setStudentId(studentId);
+                    attendance.setAttendanceDate(attendanceDate);
+                    attendance.setStatus(status);
+                    attendance.setRemark(remark);
+                    attendanceMapper.insert(attendance);
+                }
+            }
+            
+            return true;
         } catch (Exception e) {
             log.error("提交学生考勤失败", e);
-            throw new BusinessException("提交学生考勤失败");
+            throw new BusinessException("提交学生考勤失败: " + e.getMessage());
         }
     }
 

@@ -202,9 +202,19 @@ function handleGradeInput(row) {
 }
 
 function handleAttendance(row) {
+  console.log('跳转到考勤管理页面，课程信息:', {
+    courseId: row.courseId,
+    courseId类型: typeof row.courseId,
+    courseOfferingId: row.id,
+    courseOfferingId类型: typeof row.id,
+    完整数据: row
+  })
   router.push({
     name: 'AttendanceRecord',
-    query: { courseId: row.courseId, courseOfferingId: row.id }
+    query: { 
+      courseId: row.courseId, 
+      courseOfferingId: row.id 
+    }
   })
 }
 

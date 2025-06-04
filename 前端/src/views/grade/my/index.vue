@@ -330,8 +330,8 @@ function getList() {
           } else if (normalizedItem.code) {
             normalizedItem.course_code = normalizedItem.code
           }
-        }
-        
+}
+
         // 处理学分
         if (!normalizedItem.credits && normalizedItem.credit) {
           normalizedItem.credits = normalizedItem.credit
@@ -373,10 +373,10 @@ function getList() {
             normalizedItem.status_text = '已评分'
           } else if (normalizedItem.status === 2) {
             normalizedItem.status_text = '已取消'
-          } else {
+    } else {
             normalizedItem.status_text = '未知'
-          }
-        }
+    }
+  }
         
         return normalizedItem
       })
@@ -791,7 +791,7 @@ function initDistributionChart() {
   
   // 打印最终统计结果
   console.log('成绩分布统计结果:', scoreRanges)
-
+  
   // 如果没有有效成绩，显示空图表
   if (validScoreCount === 0) {
     const option = {

@@ -11,7 +11,7 @@
  Target Server Version : 80042 (8.0.42)
  File Encoding         : 65001
 
- Date: 15/05/2025 21:43:23
+ Date: 05/06/2025 02:21:17
 */
 
 SET NAMES utf8mb4;
@@ -34,7 +34,7 @@ CREATE TABLE `attendance`  (
   INDEX `idx_course_offering_id`(`course_offering_id` ASC) USING BTREE,
   INDEX `idx_student_id`(`student_id` ASC) USING BTREE,
   INDEX `idx_attendance_date`(`attendance_date` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 49 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考勤表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 66 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考勤表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of attendance
@@ -87,6 +87,23 @@ INSERT INTO `attendance` VALUES (45, 10, 6, '2024-03-04', 0, NULL, '2025-05-15 0
 INSERT INTO `attendance` VALUES (46, 10, 7, '2024-03-04', 0, NULL, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `attendance` VALUES (47, 10, 6, '2024-03-06', 4, '事假', '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `attendance` VALUES (48, 10, 7, '2024-03-06', 0, NULL, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
+INSERT INTO `attendance` VALUES (49, 7, 5, '2025-06-04', 0, '', '2025-06-05 00:29:51', '2025-06-05 00:29:51');
+INSERT INTO `attendance` VALUES (50, 7, 3, '2025-06-04', 0, '', '2025-06-05 00:29:51', '2025-06-05 00:29:51');
+INSERT INTO `attendance` VALUES (51, 20, 9, '2025-06-04', 2, '', '2025-06-05 00:30:14', '2025-06-05 00:30:14');
+INSERT INTO `attendance` VALUES (52, 4, 5, '2025-06-04', 0, '', '2025-06-05 00:32:16', '2025-06-05 00:32:16');
+INSERT INTO `attendance` VALUES (53, 4, 2, '2025-06-04', 0, '', '2025-06-05 00:32:16', '2025-06-05 00:32:16');
+INSERT INTO `attendance` VALUES (54, 4, 1, '2025-06-04', 0, '', '2025-06-05 00:32:16', '2025-06-05 00:32:16');
+INSERT INTO `attendance` VALUES (55, 2, 4, '2025-06-04', 1, '', '2025-06-05 00:36:14', '2025-06-05 00:36:14');
+INSERT INTO `attendance` VALUES (56, 2, 2, '2025-06-04', 2, '', '2025-06-05 00:36:14', '2025-06-05 00:36:14');
+INSERT INTO `attendance` VALUES (57, 2, 1, '2025-06-04', 0, '', '2025-06-05 00:36:14', '2025-06-05 00:36:14');
+INSERT INTO `attendance` VALUES (58, 6, 4, '2025-06-04', 2, '', '2025-06-05 00:38:30', '2025-06-05 00:38:30');
+INSERT INTO `attendance` VALUES (59, 6, 2, '2025-06-04', 0, '', '2025-06-05 00:38:30', '2025-06-05 00:38:30');
+INSERT INTO `attendance` VALUES (60, 10, 7, '2025-06-04', 1, '', '2025-06-05 00:40:01', '2025-06-05 00:40:01');
+INSERT INTO `attendance` VALUES (61, 10, 6, '2025-06-04', 0, '', '2025-06-05 00:40:01', '2025-06-05 00:40:01');
+INSERT INTO `attendance` VALUES (62, 1, 5, '2025-06-04', 1, '', '2025-06-05 00:40:53', '2025-06-05 00:40:53');
+INSERT INTO `attendance` VALUES (63, 1, 3, '2025-06-04', 0, '', '2025-06-05 00:40:53', '2025-06-05 00:40:53');
+INSERT INTO `attendance` VALUES (64, 1, 2, '2025-06-04', 0, '', '2025-06-05 00:40:53', '2025-06-05 00:40:53');
+INSERT INTO `attendance` VALUES (65, 9, 5, '2025-06-04', 1, '', '2025-06-05 00:41:44', '2025-06-05 00:41:44');
 
 -- ----------------------------
 -- Table structure for class
@@ -105,7 +122,7 @@ CREATE TABLE `class`  (
   UNIQUE INDEX `idx_code`(`code` ASC) USING BTREE,
   INDEX `idx_major_id`(`major_id` ASC) USING BTREE,
   INDEX `idx_advisor_id`(`advisor_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '班级表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '班级表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of class
@@ -139,7 +156,7 @@ CREATE TABLE `course`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_code`(`code` ASC) USING BTREE,
   INDEX `idx_department_id`(`department_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of course
@@ -186,7 +203,7 @@ CREATE TABLE `course_offering`  (
   INDEX `idx_course_id`(`course_id` ASC) USING BTREE,
   INDEX `idx_teacher_id`(`teacher_id` ASC) USING BTREE,
   INDEX `idx_semester`(`semester` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程开设表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程开设表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of course_offering
@@ -288,7 +305,7 @@ CREATE TABLE `department`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_code`(`code` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '院系表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '院系表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of department
@@ -314,7 +331,7 @@ CREATE TABLE `major`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_code`(`code` ASC) USING BTREE,
   INDEX `idx_department_id`(`department_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '专业表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '专业表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of major
@@ -388,7 +405,7 @@ CREATE TABLE `student`  (
   UNIQUE INDEX `idx_student_no`(`student_no` ASC) USING BTREE,
   UNIQUE INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
   INDEX `idx_class_id`(`class_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学生表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学生表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of student
@@ -413,6 +430,7 @@ INSERT INTO `student` VALUES (17, '2021007001', 29, 9, '2021-09-01', NULL, 0, '1
 INSERT INTO `student` VALUES (18, '2021007002', 30, 9, '2021-09-01', NULL, 1, '110101200306050018', '2003-06-05', '北京市东城区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `student` VALUES (19, '2021009001', 31, 10, '2021-09-01', NULL, 0, '110101200307100019', '2003-07-10', '北京市丰台区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `student` VALUES (20, '2021009002', 32, 10, '2021-09-01', NULL, 1, '110101200308150020', '2003-08-15', '北京市石景山区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
+INSERT INTO `student` VALUES (22, '20324454', 143, 11, '2025-05-12', '2025-05-31', 0, '520135485461254', '2025-05-20', 'student001', 0, '2025-05-17 18:41:46', '2025-05-17 18:41:46');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -465,7 +483,7 @@ INSERT INTO `sys_menu` VALUES (400, '教师列表', 6, 1, 'teacher-list', 'teach
 INSERT INTO `sys_menu` VALUES (401, '新增教师', 6, 2, 'teacher-add', 'teacher/add', '', 1, 0, 'C', 0, 0, 'education:teacher:add', 'Plus', '2025-05-14 15:00:06', '2025-05-14 15:00:06', '新增教师菜单');
 INSERT INTO `sys_menu` VALUES (500, '课程列表', 3, 1, 'course-list', 'course/index', '', 1, 0, 'C', 0, 0, 'course:course:list', 'List', '2025-05-14 15:00:22', '2025-05-14 15:00:22', '课程列表菜单');
 INSERT INTO `sys_menu` VALUES (501, '新增课程', 3, 2, 'course-add', 'course/add', '', 1, 0, 'C', 0, 0, 'course:course:add', 'Plus', '2025-05-14 15:00:22', '2025-05-14 15:00:22', '新增课程菜单');
-INSERT INTO `sys_menu` VALUES (502, '课程开设记录', 3, 3, 'course-offering', 'course/offering/index', '', 1, 0, 'C', 0, 0, 'course:offering:list', 'Notebook', '2025-05-14 15:00:22', '2025-05-14 15:00:22', '课程开设记录菜单');
+INSERT INTO `sys_menu` VALUES (502, '课程开设记录', 3, 3, 'course-offering', 'course/offering/index', '', 1, 0, 'C', 0, 0, 'course:offering:list', 'Notebook', '2025-05-14 15:00:22', '2025-05-17 18:01:49', '课程开设记录菜单');
 INSERT INTO `sys_menu` VALUES (600, '选课管理', 7, 1, 'selection-manage', 'selection/manage', '', 1, 0, 'C', 0, 0, 'course:selection:list', 'Setting', '2025-05-14 15:00:22', '2025-05-14 15:00:22', '选课管理菜单');
 INSERT INTO `sys_menu` VALUES (601, '授课列表', 7, 2, 'course-teaching', 'course/offering/index', '', 1, 0, 'C', 0, 0, 'course:teaching:list', 'Reading', '2025-05-14 15:00:22', '2025-05-14 15:00:22', '授课列表菜单');
 INSERT INTO `sys_menu` VALUES (650, '我的课程', 10, 1, 'my-courses', 'course/my-courses/index', '', 1, 0, 'C', 0, 0, 'course:my-courses:list', 'Notebook', '2025-05-14 15:00:22', '2025-05-14 15:00:22', '学生课程菜单');
@@ -822,7 +840,7 @@ CREATE TABLE `sys_user`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_username`(`username` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 139 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 147 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_user
@@ -859,6 +877,11 @@ INSERT INTO `sys_user` VALUES (31, 'student017', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOP
 INSERT INTO `sys_user` VALUES (32, 'student018', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '陈二十', NULL, 'chen20@example.com', '13900139018', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:22');
 INSERT INTO `sys_user` VALUES (33, 'student019', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '林二一', NULL, 'lin21@example.com', '13900139019', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:21');
 INSERT INTO `sys_user` VALUES (34, 'student020', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '黄二二', NULL, 'huang22@example.com', '13900139020', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:22');
+INSERT INTO `sys_user` VALUES (141, '00023484', '$2a$10$uaGCnMi1Kh9ab47/rs655O1.lyv8pLEP8VTaAhNMrHBUtSnBLpZzO', '嘻嘻嘻', NULL, '1610494022@qq.com', '18786079386', 0, 1, '2025-05-17 18:35:02', '2025-05-17 18:35:02');
+INSERT INTO `sys_user` VALUES (142, 'hahha', '$2a$10$KCled2Mk/IpYJRanAZJH1eNu/uC768XONFs/Gg2IWqUGAahBpaYYq', '哈哈哈哈', NULL, '1610494022@qq.com', '15484484848', 0, 1, '2025-05-17 18:35:32', '2025-05-17 18:35:32');
+INSERT INTO `sys_user` VALUES (143, '20324454', '$2a$10$4u9AgZAy75zqSd4SJaOi2Oyj4NMvJ7tSadxryN2lcZxmb20g0pbnW', '张力王', NULL, '1610494022@qq.com', '15481654852', 0, 2, '2025-05-17 18:41:46', '2025-05-17 18:41:46');
+INSERT INTO `sys_user` VALUES (144, '203245', '$2a$10$22ykkKeiBNKg5N5AKslF5O6aYdEGGZYOR9fZtn8BPPZukNXaskPZ.', '找那个', NULL, '1610494022@qq.com', '18786079386', 0, 1, '2025-05-17 18:43:32', '2025-05-17 18:43:32');
+INSERT INTO `sys_user` VALUES (146, '00215', '$2a$10$MH.H8GIr1vSWAmPCL2heI.MPRtr.mEW3ipYHeWXyWOZ8Oakbwtw7i', 'zhangsan', NULL, '1610494022@qq.com', '15484484848', 0, 1, '2025-05-17 18:46:50', '2025-05-17 18:46:50');
 
 -- ----------------------------
 -- Table structure for sys_user_role
@@ -905,6 +928,10 @@ INSERT INTO `sys_user_role` VALUES (29, 3);
 INSERT INTO `sys_user_role` VALUES (30, 3);
 INSERT INTO `sys_user_role` VALUES (31, 3);
 INSERT INTO `sys_user_role` VALUES (32, 3);
+INSERT INTO `sys_user_role` VALUES (141, 2);
+INSERT INTO `sys_user_role` VALUES (142, 2);
+INSERT INTO `sys_user_role` VALUES (144, 2);
+INSERT INTO `sys_user_role` VALUES (146, 2);
 
 -- ----------------------------
 -- Table structure for teacher
@@ -927,7 +954,7 @@ CREATE TABLE `teacher`  (
   UNIQUE INDEX `idx_teacher_no`(`teacher_no` ASC) USING BTREE,
   UNIQUE INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
   INDEX `idx_department_id`(`department_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '教师表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '教师表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of teacher
@@ -942,6 +969,10 @@ INSERT INTO `teacher` VALUES (7, 'T20210007', 9, 4, '讲师', 1, '11010119880422
 INSERT INTO `teacher` VALUES (8, 'T20210008', 10, 4, '教授', 0, '110101197508030008', '1975-08-03', '2009-09-01', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `teacher` VALUES (9, 'T20210009', 11, 5, '副教授', 0, '110101198211150009', '1982-11-15', '2014-09-01', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `teacher` VALUES (10, 'T20210010', 12, 5, '讲师', 1, '110101198706270010', '1987-06-27', '2016-09-01', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
+INSERT INTO `teacher` VALUES (11, '00023484', 141, 6, '教授', 0, '523154652856451', '2025-05-07', '2025-05-12', 0, '2025-05-17 18:35:02', '2025-05-17 18:35:02');
+INSERT INTO `teacher` VALUES (12, 'hahha', 142, 6, '教授', 0, '520103200315485164', '2025-05-26', '2025-05-19', 0, '2025-05-17 18:35:32', '2025-05-17 18:35:32');
+INSERT INTO `teacher` VALUES (13, '203245', 144, 6, '教授', 0, '520135484615824685', '2025-05-28', '2025-05-15', 0, '2025-05-17 18:43:33', '2025-05-17 18:43:33');
+INSERT INTO `teacher` VALUES (15, '00215', 146, 6, '副教授', 0, '520135484561574', '2025-05-20', '2025-06-02', 0, '2025-05-17 18:46:50', '2025-05-17 18:46:50');
 
 -- ----------------------------
 -- Table structure for todo_item

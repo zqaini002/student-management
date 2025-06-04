@@ -110,10 +110,15 @@ export function getTeacherCourses(teacherId, query) {
  * @returns {Promise}
  */
 export function getTeacherCourseStudents(teacherId, courseId, query) {
+  const queryParams = { ...query };
+  if (teacherId !== null && teacherId !== undefined) {
+    queryParams.teacherId = teacherId;
+  }
+  
   return request({
-    url: `/teacher/courses/${teacherId}/students/${courseId}`,
+    url: `/teacher/courses/students/${courseId}`,
     method: 'post',
-    data: query
+    data: queryParams
   })
 }
 
@@ -140,11 +145,19 @@ export function submitStudentGrade(teacherId, courseId, data) {
  * @returns {Promise}
  */
 export function submitStudentAttendance(teacherId, courseId, data) {
-  return request({
-    url: `/teacher/courses/${teacherId}/attendance/${courseId}`,
-    method: 'put',
-    data: data
-  })
+  if (teacherId === null || teacherId === undefined) {
+    return request({
+      url: `/teacher/courses/attendance/${courseId}`,
+      method: 'put',
+      data: data
+    })
+  } else {
+    return request({
+      url: `/teacher/courses/${teacherId}/attendance/${courseId}`,
+      method: 'put',
+      data: data
+    })
+  }
 }
 
 /**

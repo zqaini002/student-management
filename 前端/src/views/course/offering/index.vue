@@ -60,9 +60,12 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" min-width="180" fixed="right">
+        <el-table-column label="操作" min-width="220" fixed="right">
           <template #default="scope">
             <el-button type="primary" link @click="openDialog('edit', scope.row)">编辑</el-button>
+            <el-button type="success" link @click="handleAttendance(scope.row)">
+              <el-icon><Clock /></el-icon>考勤管理
+            </el-button>
             <el-button type="danger" link @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
@@ -141,10 +144,12 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getCourseOfferingList, addCourseOffering, updateCourseOffering, deleteCourseOffering } from '@/api/courseOffering'
 import { getAllCourses } from '@/api/course'
 import { getAllTeachers } from '@/api/teacher'
+import { Plus, Search, Refresh, Clock } from '@element-plus/icons-vue'
 
 const queryParams = reactive({
   courseName: '',
@@ -184,6 +189,8 @@ const rules = {
   capacity: [{ required: true, message: '请输入容量', trigger: 'blur' }]
 }
 const formRef = ref(null)
+
+const router = useRouter()
 
 function fetchList() {
   loading.value = true
@@ -305,6 +312,48 @@ function fetchCourseAndTeacher() {
     console.error('获取教师列表异常:', err);
     teacherList.value = [];
   });
+}
+function handleAttendance(row) {
+  // 跳转到考勤记录页面
+  console.log('跳转到考勤记录页面，参数:', {
+    courseId: row.courseId,
+    courseOfferingId: row.id,
+    row: row
+  })
+  
+  try {
+    // 提示用户正在跳转
+    ElMessage.info('正在跳转到考勤记录页面...');
+    
+    // 使用后台菜单中定义的路径，而不是路由配置中的路径
+    // 从路由日志看，正确的路径是/attendance-record
+    router.push({
+      path: '/attendance-record',
+      query: {
+        courseId: row.courseId,
+        courseOfferingId: row.id
+      }
+    }).catch(err => {
+      console.error('路由跳转失败，尝试备用方案:', err);
+      
+      // 尝试备用导航方式 - 先导航到首页，再尝试考勤路径
+      router.push('/').then(() => {
+        setTimeout(() => {
+          router.push({
+            path: '/attendance-record',
+            query: {
+              courseId: row.courseId,
+              courseOfferingId: row.id,
+              _t: new Date().getTime() // 添加时间戳避免缓存
+            }
+          });
+        }, 300);
+      });
+    });
+  } catch (error) {
+    console.error('考勤管理跳转错误:', error);
+    ElMessage.error('页面跳转发生错误，请联系管理员');
+  }
 }
 onMounted(() => {
   fetchList()

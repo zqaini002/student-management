@@ -273,6 +273,7 @@ student-management-system
 - 🔧 解决了Excel导入学生信息时的数据校验问题：增强了数据格式验证
 - 🔧 修复了学生管理页面新增按钮跳转问题：统一路由格式，将'/student/add'改为'/student-add'，确保路径一致性
 - 🔧 修复了教师管理新增页面返回按钮跳转问题：统一路由格式，将'/teacher/list'改为'/teacher-list'，解决了页面跳转404问题
+- 🔧 修复了管理员考勤记录没有相关数据和权限问题
 
 ### 5. Knife4j文档访问
 - 📚 访问地址：http://localhost:8080/api/doc.html

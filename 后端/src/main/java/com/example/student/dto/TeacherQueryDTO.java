@@ -15,6 +15,9 @@ import lombok.EqualsAndHashCode;
 @Schema(description = "教师查询条件")
 public class TeacherQueryDTO extends PageRequest {
 
+    @Schema(description = "教师ID")
+    private Long teacherId;
+
     @Schema(description = "教师编号")
     private String teacherNo;
 
@@ -41,6 +44,9 @@ public class TeacherQueryDTO extends PageRequest {
     
     @Schema(description = "学号")
     private String studentNo;
+    
+    @Schema(description = "学生ID，用于查询单个学生的考勤详情")
+    private Long studentId;
     
     @Schema(description = "邮箱")
     private String email;

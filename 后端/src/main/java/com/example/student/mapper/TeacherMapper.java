@@ -91,13 +91,15 @@ public interface TeacherMapper extends BaseMapper<Teacher> {
      * @param studentName 学生姓名
      * @param studentNo 学号
      * @param status 状态
+     * @param studentId 学生ID（可选，用于查询单个学生的详细考勤记录）
      * @return 分页结果
      */
     IPage<TeacherCourseStudentVO> selectTeacherCourseStudentPage(Page<TeacherCourseStudentVO> page,
                                                                @Param("courseId") Long courseId,
                                                                @Param("studentName") String studentName,
                                                                @Param("studentNo") String studentNo,
-                                                               @Param("status") Integer status);
+                                                               @Param("status") Integer status,
+                                                               @Param("studentId") Long studentId);
     
     /**
      * 获取教师统计数据
