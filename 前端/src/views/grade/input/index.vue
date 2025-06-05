@@ -461,9 +461,24 @@ async function fetchTeacherId() {
   try {
     // 使用userStore中的userInfo属性，而不是调用getUserInfo方法
     const userInfo = userStore.userInfo
+    
+    // 判断用户类型和角色
+    const isAdmin = userInfo && userInfo.roles && userInfo.roles.includes('admin')
+    const isTeacher = userInfo && userInfo.roles && userInfo.roles.includes('teacher')
+    
     if (userInfo && userInfo.teacherId) {
+      // 教师用户
       teacherId.value = userInfo.teacherId
+    } else if (isTeacher && userInfo.userId) {
+      // 教师用户但没有teacherId字段，使用userId作为替代
+      console.log('教师用户但缺少teacherId，使用userId替代:', userInfo.userId)
+      teacherId.value = userInfo.userId
+    } else if (isAdmin) {
+      // 管理员用户 - 不需要特定的teacherId
+      console.log('管理员用户访问成绩录入页面')
+      teacherId.value = null
     } else {
+      console.warn('未知用户类型或缺少必要信息:', userInfo)
       ElMessage.warning('获取教师信息失败，请重新登录')
     }
   } catch (error) {
@@ -523,11 +538,14 @@ const handleQuery = async () => {
   
   loading.value = true
   try {
-    // 添加teacherId参数
-    const params = {
-      ...queryParams,
-      teacherId: teacherId.value
+    // 构建查询参数
+    const params = { ...queryParams }
+    
+    // 只有当teacherId有值时才添加到参数中
+    if (teacherId.value !== null) {
+      params.teacherId = teacherId.value
     }
+    
     console.log('查询成绩列表参数:', params)
     
     const res = await getStudentGradesList(params)
@@ -650,6 +668,7 @@ const handleSaveGrades = () => {
   
   const saveItems = selectedRows.value.map(row => {
     return {
+      selectionId: row.selectionId, // 使用正确的字段名
       id: row.id,
       studentId: row.studentId,
       courseId: row.courseId,
@@ -664,15 +683,10 @@ const handleSaveGrades = () => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
-  loading.value = true
+    loading.value = true
     
-    const params = {
-      teacherId: teacherId.value,
-      courseId: queryParams.courseId,
-      grades: saveItems
-    }
-    
-    batchSubmitGrades(params).then(res => {
+    // 直接传递成绩数组，不包装在对象中
+    batchSubmitGrades(saveItems).then(res => {
       ElMessage.success('成绩保存成功')
       // 刷新数据
       handleQuery()
