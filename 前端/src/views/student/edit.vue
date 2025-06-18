@@ -368,7 +368,7 @@ const submitForm = async () => {
         ElMessage.success('学生信息更新成功')
         
         // 返回列表页
-        router.push('/student/list')
+        router.push('/student-list')
       } catch (error) {
         console.error('更新学生失败:', error)
         ElMessage.error(error.response?.data?.message || '更新学生失败')

@@ -776,18 +776,15 @@ const handleAdd = () => {
 const handleUpdate = (row) => {
   try {
     console.log('编辑学生信息:', row.id)
-    // 方式1：使用router.push跳转
-    router.push(`/student/edit/${row.id}`)
+    // 使用正确的路由路径格式
+    router.push(`/student-edit/${row.id}`)
     
-    // 如果上面的路由跳转不生效，尝试下面的方式
-    // 添加延迟，确保路由可用
+    // 如果上面的路由跳转不生效，使用完整配置格式
     /*
-    setTimeout(() => {
-      router.push({
-        path: `/student/edit/${row.id}`,
-        query: { timestamp: new Date().getTime() }
-      })
-    }, 100)
+    router.push({
+      name: 'StudentEdit',
+      params: { id: row.id }
+    })
     */
   } catch (error) {
     console.error('跳转到编辑页面失败:', error)

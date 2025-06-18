@@ -134,6 +134,20 @@ export const constantRoutes = [
       }
     ]
   },
+  // 添加直接访问编辑页面的路由
+  {
+    path: '/student-edit/:id',
+    component: Layout,
+    children: [
+      {
+        path: '',
+        name: 'StudentEdit',
+        component: loadView('student/edit'),
+        meta: { title: '编辑学生', activeMenu: '/student/list' }
+      }
+    ],
+    hidden: true
+  },
   // 404页面 - 放在最后，捕获所有未匹配的路由
   {
     path: '/:pathMatch(.*)*',
