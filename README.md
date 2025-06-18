@@ -26,6 +26,19 @@
 ## 📋 项目介绍
 本项目是一个基于Spring Boot + Spring Security + JWT + MyBatis-Plus的学生信息管理系统，提供完整的学生信息管理功能，包括用户认证、学生管理、课程管理、成绩管理等。
 
+！！！存在路由混乱问题！！！！
+1. 路由定义分散
+路由定义分布在多个文件中：router/index.js、router/manualRoutes.js、stores/permission.js 缺乏统一的路由管理机制，导致路由注册和查找逻辑复杂
+2. 多重组件加载机制
+存在多种组件加载方式：直接导入、动态导入、手动映射
+loadComponent、findComponentModule、getManualComponent等多个函数处理相似功能
+3. 特殊路由处理过多
+针对特定路由如/student/edit/、/course/list等有特殊处理代码
+4. 动态路由加载问题
+动态路由加载依赖于用户权限，刷新页面时可能导致路由丢失
+5. 路由别名和路径混乱
+同一路由存在多种路径表示方式，如/student/edit/:id和student/edit/:id
+
 ## 🔧 技术栈
 - 🍃 Spring Boot 3.1.5
 - 🔒 Spring Security 6.1.5
