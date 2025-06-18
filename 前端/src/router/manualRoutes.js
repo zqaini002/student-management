@@ -12,6 +12,9 @@ import TeacherList from '@/views/teacher/index.vue'
 import DashboardIndex from '@/views/dashboard/index.vue'
 import AttendanceRecord from '@/views/attendance/record/index.vue'
 import GradeInput from '@/views/grade/input/index.vue'
+import StudentAdd from '@/views/student/add.vue'
+import StudentList from '@/views/student/index.vue'
+import StudentEdit from '@/views/student/edit.vue'
 
 export const manualComponentMap = {
   // 仪表盘组件
@@ -34,6 +37,15 @@ export const manualComponentMap = {
   'teacher/index': TeacherList,
   'teacher/index.vue': TeacherList,
   'teacher/list': TeacherList,
+  
+  // 学生管理组件
+  'student/add': StudentAdd,
+  'student/add.vue': StudentAdd,
+  'student/index': StudentList,
+  'student/index.vue': StudentList,
+  'student/edit': StudentEdit,
+  'student/edit.vue': StudentEdit,
+  'student/edit/:id': StudentEdit,
   
   // 考勤管理组件
   'attendance/record/index': AttendanceRecord,
@@ -72,6 +84,12 @@ export function getManualComponent(path) {
   if (normalizedPath === 'course/list') {
     console.log(`[手动映射] 特殊处理 course/list 路径`)
     return manualComponentMap['course/list'] || manualComponentMap['course/index'] || null
+  }
+  
+  // 特殊处理student/edit路径
+  if (normalizedPath.startsWith('student/edit/')) {
+    console.log(`[手动映射] 特殊处理 student/edit 路径`)
+    return manualComponentMap['student/edit'] || null
   }
   
   // 依次尝试不同的路径格式

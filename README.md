@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![JDK](https://img.shields.io/badge/JDK-17%2B-orange.svg)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 
-> 2025大三下帮助室友完成他的作业手搓完成的基于Spring Boot + Spring Security + JWT + MyBatis-Plus的完整学生信息管理系统
+> 2025大三下基于Spring Boot + Spring Security + JWT + MyBatis-Plus的完整学生信息管理系统
 
 ## 📑 目录
 

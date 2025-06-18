@@ -95,6 +95,14 @@ router.beforeEach(async (to, from, next) => {
             hasAddRoutes = false
             isRefreshing = true
             
+            // 特殊处理一些常见但未匹配到的路由
+            const specialRoutes = ['/student/edit/', '/teacher/edit/', '/course/edit/']
+            if (specialRoutes.some(route => to.path.includes(route))) {
+              console.log(`路由守卫 - 检测到特殊路由: ${to.path}，确保路由加载正确`)
+              // 确保消息路由已正确添加
+              registerMessageRoutes()
+            }
+            
             // 重新生成动态路由
             const accessRoutes = await permissionStore.generateRoutes()
             accessRoutes.forEach(route => {

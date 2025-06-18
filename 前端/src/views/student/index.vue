@@ -774,7 +774,25 @@ const handleAdd = () => {
 
 // 编辑按钮
 const handleUpdate = (row) => {
-  router.push(`/student/edit/${row.id}`)
+  try {
+    console.log('编辑学生信息:', row.id)
+    // 方式1：使用router.push跳转
+    router.push(`/student/edit/${row.id}`)
+    
+    // 如果上面的路由跳转不生效，尝试下面的方式
+    // 添加延迟，确保路由可用
+    /*
+    setTimeout(() => {
+      router.push({
+        path: `/student/edit/${row.id}`,
+        query: { timestamp: new Date().getTime() }
+      })
+    }, 100)
+    */
+  } catch (error) {
+    console.error('跳转到编辑页面失败:', error)
+    ElMessage.error('跳转失败，请刷新页面后重试')
+  }
 }
 
 // 查看详情

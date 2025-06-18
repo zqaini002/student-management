@@ -221,6 +221,13 @@ export function loadComponent(path) {
       return Promise.resolve(CourseList)
     }
     
+    // 对student/edit路径进行特殊处理
+    if (path.startsWith('student/edit/') || path.startsWith('/student/edit/')) {
+      console.log('检测到student/edit路径，进行特殊处理')
+      const StudentEdit = require('@/views/student/edit.vue').default
+      return Promise.resolve(StudentEdit)
+    }
+    
     // 优先检查是否有手动映射的组件
     try {
       // 动态导入手动映射组件

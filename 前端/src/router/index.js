@@ -216,7 +216,8 @@ export const asyncRoutes = [
         name: 'StudentEdit',
         component: loadView('student/edit'),
         meta: { title: '编辑学生', activeMenu: '/student/list' },
-        hidden: true
+        hidden: true,
+        alias: '/student/edit/:id'
       }
     ]
   },
