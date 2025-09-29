@@ -397,19 +397,29 @@ public class DashboardServiceImpl implements DashboardService {
         List<String> labels = Arrays.asList("90-100分", "80-89分", "70-79分", "60-69分", "不及格");
         List<Integer> data = new ArrayList<>();
         
-        // 获取各分数段的课程数量
-        int excellent = ((Number) gradeStats.getOrDefault("excellent", 0)).intValue();
-        int good = ((Number) gradeStats.getOrDefault("good", 0)).intValue();
-        int average = ((Number) gradeStats.getOrDefault("average", 0)).intValue();
-        int pass = ((Number) gradeStats.getOrDefault("pass", 0)).intValue();
-        int fail = ((Number) gradeStats.getOrDefault("fail", 0)).intValue();
-        
-        // 添加到数据列表
-        data.add(excellent);
-        data.add(good);
-        data.add(average);
-        data.add(pass);
-        data.add(fail);
+        // 检查gradeStats是否为null，如果为null说明该学生还没有成绩记录
+        if (gradeStats == null || gradeStats.isEmpty()) {
+            // 如果没有成绩数据，返回全部为0的图表数据
+            data.add(0); // excellent
+            data.add(0); // good
+            data.add(0); // average
+            data.add(0); // pass
+            data.add(0); // fail
+        } else {
+            // 获取各分数段的课程数量
+            int excellent = gradeStats.get("excellent") != null ? ((Number) gradeStats.get("excellent")).intValue() : 0;
+            int good = gradeStats.get("good") != null ? ((Number) gradeStats.get("good")).intValue() : 0;
+            int average = gradeStats.get("average") != null ? ((Number) gradeStats.get("average")).intValue() : 0;
+            int pass = gradeStats.get("pass") != null ? ((Number) gradeStats.get("pass")).intValue() : 0;
+            int fail = gradeStats.get("fail") != null ? ((Number) gradeStats.get("fail")).intValue() : 0;
+            
+            // 添加到数据列表
+            data.add(excellent);
+            data.add(good);
+            data.add(average);
+            data.add(pass);
+            data.add(fail);
+        }
         
         // 处理数据
         Map<String, List<Integer>> seriesData = new HashMap<>();
@@ -417,7 +427,7 @@ public class DashboardServiceImpl implements DashboardService {
         
         // 添加平均分数据
         Map<String, List<Double>> seriesDataDouble = new HashMap<>();
-        if (gradeStats.containsKey("averageScore") && gradeStats.get("averageScore") != null) {
+        if (gradeStats != null && gradeStats.containsKey("averageScore") && gradeStats.get("averageScore") != null) {
             Double averageScore = ((Number) gradeStats.get("averageScore")).doubleValue();
             List<Double> averageScoreList = new ArrayList<>();
             averageScoreList.add(averageScore);

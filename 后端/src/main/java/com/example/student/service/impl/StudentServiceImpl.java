@@ -13,9 +13,11 @@ import com.example.student.dto.StudentImportDTO;
 import com.example.student.dto.StudentQueryDTO;
 import com.example.student.entity.Student;
 import com.example.student.entity.SysUser;
+import com.example.student.entity.SysUserRole;
 import com.example.student.mapper.ClassMapper;
 import com.example.student.mapper.StudentMapper;
 import com.example.student.mapper.SysUserMapper;
+import com.example.student.mapper.SysUserRoleMapper;
 import com.example.student.service.StudentService;
 import com.example.student.vo.StudentAttendanceVO;
 import com.example.student.vo.StudentCourseVO;
@@ -53,6 +55,9 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
 
     @Resource
     private SysUserMapper sysUserMapper;
+    
+    @Resource
+    private SysUserRoleMapper sysUserRoleMapper;
 
     @Resource
     private ClassMapper classMapper;
@@ -148,7 +153,15 @@ public class StudentServiceImpl extends ServiceImpl<StudentMapper, Student> impl
         student.setBirthday(studentDTO.getBirthday());
         student.setAddress(studentDTO.getAddress());
         student.setStatus(0); // 在读
-        return save(student);
+        boolean result = save(student);
+        
+        // 分配学生角色
+        SysUserRole userRole = new SysUserRole();
+        userRole.setUserId(user.getId());
+        userRole.setRoleId(3L); // 学生角色ID
+        sysUserRoleMapper.insert(userRole);
+        
+        return result;
     }
 
     @Override
