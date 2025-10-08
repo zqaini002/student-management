@@ -1,14 +1,22 @@
 package com.example.student.service.impl;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.read.listener.PageReadListener;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.student.common.PageResult;
+import com.example.student.dto.GradeImportDTO;
 import com.example.student.dto.GradeQueryDTO;
+import com.example.student.entity.Course;
+import com.example.student.entity.CourseOffering;
 import com.example.student.entity.CourseSelection;
+import com.example.student.entity.Student;
 import com.example.student.mapper.ClassMapper;
 import com.example.student.mapper.CourseMapper;
 import com.example.student.mapper.CourseSelectionMapper;
 import com.example.student.mapper.CourseOfferingMapper;
+import com.example.student.mapper.StudentMapper;
 import com.example.student.service.GradeService;
 import com.example.student.util.ExcelUtils;
 import com.example.student.vo.GradeStatisticsVO;
@@ -20,11 +28,16 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -48,6 +61,9 @@ public class GradeServiceImpl implements GradeService {
     private final CourseMapper courseMapper;
     private final ClassMapper classMapper;
     private final CourseOfferingMapper courseOfferingMapper;
+    
+    @Resource
+    private StudentMapper studentMapper;
 
     @Override
     public GradeStatisticsVO getGradeStatistics(GradeQueryDTO queryDTO) {
@@ -536,5 +552,213 @@ public class GradeServiceImpl implements GradeService {
                 courseOfferingId);
         
         return result.getRecords();
+    }
+    
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> importGrade(MultipartFile file) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+        List<GradeImportDTO> successList = new ArrayList<>();
+        List<GradeImportDTO> failList = new ArrayList<>();
+        
+        try {
+            // 读取Excel文件
+            EasyExcel.read(file.getInputStream(), GradeImportDTO.class, new PageReadListener<GradeImportDTO>(dataList -> {
+                for (GradeImportDTO importDTO : dataList) {
+                    try {
+                        // 数据校验
+                        if (!StringUtils.hasText(importDTO.getStudentNo())) {
+                            importDTO.setErrorMsg("学号不能为空");
+                            failList.add(importDTO);
+                            continue;
+                        }
+                        
+                        if (!StringUtils.hasText(importDTO.getCourseCode())) {
+                            importDTO.setErrorMsg("课程编码不能为空");
+                            failList.add(importDTO);
+                            continue;
+                        }
+                        
+                        if (!StringUtils.hasText(importDTO.getSemester())) {
+                            importDTO.setErrorMsg("学期不能为空");
+                            failList.add(importDTO);
+                            continue;
+                        }
+                        
+                        if (importDTO.getScore() == null) {
+                            importDTO.setErrorMsg("成绩不能为空");
+                            failList.add(importDTO);
+                            continue;
+                        }
+                        
+                        if (importDTO.getScore() < 0 || importDTO.getScore() > 100) {
+                            importDTO.setErrorMsg("成绩必须在0-100之间");
+                            failList.add(importDTO);
+                            continue;
+                        }
+                        
+                        // 查询学生
+                        LambdaQueryWrapper<Student> studentWrapper = new LambdaQueryWrapper<>();
+                        studentWrapper.eq(Student::getStudentNo, importDTO.getStudentNo());
+                        Student student = studentMapper.selectOne(studentWrapper);
+                        if (student == null) {
+                            importDTO.setErrorMsg("学号不存在：" + importDTO.getStudentNo());
+                            failList.add(importDTO);
+                            continue;
+                        }
+                        
+                        // 查询课程
+                        LambdaQueryWrapper<Course> courseWrapper = new LambdaQueryWrapper<>();
+                        courseWrapper.eq(Course::getCode, importDTO.getCourseCode());
+                        Course course = courseMapper.selectOne(courseWrapper);
+                        if (course == null) {
+                            importDTO.setErrorMsg("课程编码不存在：" + importDTO.getCourseCode());
+                            failList.add(importDTO);
+                            continue;
+                        }
+                        
+                        // 查询课程开设
+                        LambdaQueryWrapper<CourseOffering> offeringWrapper = new LambdaQueryWrapper<>();
+                        offeringWrapper.eq(CourseOffering::getCourseId, course.getId())
+                                      .eq(CourseOffering::getSemester, importDTO.getSemester());
+                        CourseOffering courseOffering = courseOfferingMapper.selectOne(offeringWrapper);
+                        if (courseOffering == null) {
+                            importDTO.setErrorMsg("该学期未开设此课程：" + importDTO.getSemester());
+                            failList.add(importDTO);
+                            continue;
+                        }
+                        
+                        // 查询选课记录
+                        LambdaQueryWrapper<CourseSelection> selectionWrapper = new LambdaQueryWrapper<>();
+                        selectionWrapper.eq(CourseSelection::getStudentId, student.getId())
+                                       .eq(CourseSelection::getCourseOfferingId, courseOffering.getId());
+                        CourseSelection selection = courseSelectionMapper.selectOne(selectionWrapper);
+                        if (selection == null) {
+                            importDTO.setErrorMsg("学生未选修此课程");
+                            failList.add(importDTO);
+                            continue;
+                        }
+                        
+                        // 更新成绩
+                        selection.setScore(BigDecimal.valueOf(importDTO.getScore()));
+                        
+                        // 计算等级
+                        String grade = calculateGrade(importDTO.getScore());
+                        // 判断是否通过
+                        Integer isPassed = importDTO.getScore() >= 60 ? 1 : 0;
+                        
+                        // 更新选课记录
+                        courseSelectionMapper.updateById(selection);
+                        
+                        // 添加到成功列表
+                        successList.add(importDTO);
+                    } catch (Exception e) {
+                        log.error("导入成绩数据异常", e);
+                        importDTO.setErrorMsg("导入异常：" + e.getMessage());
+                        failList.add(importDTO);
+                    }
+                }
+            })).sheet().doRead();
+            
+            result.put("total", successList.size() + failList.size());
+            result.put("success", successList.size());
+            result.put("fail", failList.size());
+            result.put("failList", failList);
+        } catch (Exception e) {
+            log.error("导入成绩失败", e);
+            throw new ServiceException("导入成绩失败：" + e.getMessage());
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public void exportGrade(Long courseId, String semester, Long classId, String studentName, HttpServletResponse response) throws IOException {
+        try {
+            // 查询成绩数据
+            List<StudentGradeVO> gradeList = courseSelectionMapper.selectStudentsWithGrades(
+                    new Page<>(1, Integer.MAX_VALUE),
+                    courseId,
+                    studentName,
+                    classId,
+                    semester,
+                    null
+            ).getRecords();
+            
+            // 转换为导出DTO
+            List<GradeImportDTO> exportList = new ArrayList<>();
+            for (StudentGradeVO vo : gradeList) {
+                GradeImportDTO dto = new GradeImportDTO();
+                dto.setStudentNo(vo.getStudentNo());
+                dto.setStudentName(vo.getStudentName());
+                dto.setCourseCode(vo.getCourseCode());
+                dto.setCourseName(vo.getCourseName());
+                dto.setSemester(vo.getSemester());
+                dto.setScore(vo.getScore() != null ? vo.getScore().doubleValue() : null);
+                exportList.add(dto);
+            }
+            
+            // 设置响应头
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            String fileName = URLEncoder.encode("成绩数据_" + System.currentTimeMillis(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            
+            // 写入Excel
+            EasyExcel.write(response.getOutputStream(), GradeImportDTO.class)
+                    .sheet("成绩数据")
+                    .doWrite(exportList);
+                    
+        } catch (Exception e) {
+            log.error("导出成绩失败", e);
+            throw new IOException("导出成绩失败：" + e.getMessage());
+        }
+    }
+    
+    @Override
+    public void downloadGradeTemplate(HttpServletResponse response) throws IOException {
+        try {
+            // 创建模板数据
+            List<GradeImportDTO> templateList = new ArrayList<>();
+            GradeImportDTO template = new GradeImportDTO();
+            template.setStudentNo("2021001001");
+            template.setStudentName("张三");
+            template.setCourseCode("CS101");
+            template.setCourseName("程序设计基础(Java)");
+            template.setSemester("2023-2024-1");
+            template.setScore(85.5);
+            template.setComment("表现良好");
+            templateList.add(template);
+            
+            // 设置响应头
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            String fileName = URLEncoder.encode("成绩导入模板", StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            
+            // 写入Excel
+            EasyExcel.write(response.getOutputStream(), GradeImportDTO.class)
+                    .sheet("成绩模板")
+                    .doWrite(templateList);
+                    
+        } catch (Exception e) {
+            log.error("下载成绩导入模板失败", e);
+            throw new IOException("下载模板失败：" + e.getMessage());
+        }
+    }
+    
+    /**
+     * 计算成绩等级
+     */
+    private String calculateGrade(Double score) {
+        if (score == null) return null;
+        if (score >= 95) return "A+";
+        if (score >= 90) return "A";
+        if (score >= 85) return "B+";
+        if (score >= 80) return "B";
+        if (score >= 75) return "C+";
+        if (score >= 70) return "C";
+        if (score >= 60) return "D";
+        return "F";
     }
 } 

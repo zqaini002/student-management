@@ -362,7 +362,7 @@ import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, Refresh, Check, Close, Upload, Download, Document, Back } from '@element-plus/icons-vue'
-import { getCourseOptions, getClassOptions, getSemesterList, getStudentGradesList, batchSubmitGrades } from '@/api/grade'
+import { getCourseOptions, getClassOptions, getSemesterList, getStudentGradesList, batchSubmitGrades, importGrade, exportGrade, downloadGradeTemplate } from '@/api/grade'
 import { useUserStore } from '@/stores/user'
 
 // 路由
@@ -819,7 +819,7 @@ const handleFileChange = (file, fileList) => {
 }
 
 // 提交导入
-const submitImport = () => {
+const submitImport = async () => {
   if (importDialog.fileList.length === 0) {
     ElMessage.warning('请先选择要导入的文件')
     return
@@ -838,30 +838,105 @@ const submitImport = () => {
   
   importDialog.loading = true
   
-  // 模拟导入过程
-  setTimeout(() => {
-    importDialog.loading = false
+  try {
+    // 创建FormData
+    const formData = new FormData()
+    formData.append('file', file)
+    
+    // 调用导入接口
+    const res = await importGrade(formData)
+    const data = res.data || {}
+    const total = data.total || 0
+    const success = data.success || 0
+    const fail = data.fail || 0
+    
+    if (total === 0) {
+      ElMessage.warning('Excel文件中没有数据')
+    } else if (fail === 0) {
+      ElMessage.success(`导入成功！共导入${success}条数据`)
+    } else {
+      ElMessage.warning(`导入完成！成功${success}条，失败${fail}条`)
+      if (data.failList && data.failList.length > 0) {
+        console.error('导入失败的数据:', data.failList)
+      }
+    }
+    
     importDialog.visible = false
     importDialog.fileList = []
-    
-    ElMessage.success('成绩导入成功')
     handleQuery() // 刷新数据
-  }, 1500)
+  } catch (error) {
+    console.error('导入成绩失败:', error)
+    ElMessage.error(error.message || '导入成绩失败')
+  } finally {
+    importDialog.loading = false
+  }
 }
 
 // 导出成绩
-const handleExportGrades = () => {
+const handleExportGrades = async () => {
+  if (!queryParams.courseId || !queryParams.semester) {
+    ElMessage.warning('请先选择课程和学期')
+    return
+  }
+  
   if (tableData.value.length === 0) {
     ElMessage.warning('没有可导出的数据')
     return
   }
   
-  ElMessage.info('导出成绩功能待实现')
+  try {
+    const params = {
+      courseId: queryParams.courseId,
+      semester: queryParams.semester,
+      classId: queryParams.classId,
+      studentName: queryParams.studentName
+    }
+    
+    const response = await exportGrade(params)
+    
+    // response是axios响应对象，blob数据在response.data中
+    const blob = response.data || response
+    
+    // 创建下载链接
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `成绩数据_${new Date().getTime()}.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    ElMessage.success('导出成功')
+  } catch (error) {
+    console.error('导出成绩失败:', error)
+    ElMessage.error('导出成绩失败')
+  }
 }
 
 // 下载导入模板
-const handleDownloadTemplate = () => {
-  ElMessage.info('下载导入模板功能待实现')
+const handleDownloadTemplate = async () => {
+  try {
+    const response = await downloadGradeTemplate()
+    
+    // response是axios响应对象，blob数据在response.data中
+    const blob = response.data || response
+    
+    // 创建下载链接
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `成绩导入模板.xlsx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    ElMessage.success('模板下载成功')
+  } catch (error) {
+    console.error('下载模板失败:', error)
+    ElMessage.error('下载模板失败')
+  }
 }
 </script>
 

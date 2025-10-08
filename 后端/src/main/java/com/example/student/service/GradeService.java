@@ -5,6 +5,7 @@ import com.example.student.dto.GradeQueryDTO;
 import com.example.student.vo.GradeStatisticsVO;
 import com.example.student.vo.StudentGradeVO;
 import com.example.student.common.PageResult;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -88,4 +89,33 @@ public interface GradeService {
      * @return 学生成绩列表
      */
     List<StudentGradeVO> getStudentGradeList(Page<StudentGradeVO> page, Long courseOfferingId, String semester, Long classId, String keyword);
+    
+    /**
+     * 导入成绩数据
+     *
+     * @param file Excel文件
+     * @return 导入结果
+     * @throws Exception 异常
+     */
+    Map<String, Object> importGrade(MultipartFile file) throws Exception;
+    
+    /**
+     * 导出成绩数据
+     *
+     * @param courseId 课程ID
+     * @param semester 学期
+     * @param classId 班级ID
+     * @param studentName 学生姓名
+     * @param response HTTP响应
+     * @throws IOException IO异常
+     */
+    void exportGrade(Long courseId, String semester, Long classId, String studentName, HttpServletResponse response) throws IOException;
+    
+    /**
+     * 下载成绩导入模板
+     *
+     * @param response HTTP响应
+     * @throws IOException IO异常
+     */
+    void downloadGradeTemplate(HttpServletResponse response) throws IOException;
 } 

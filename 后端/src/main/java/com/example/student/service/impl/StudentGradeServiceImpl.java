@@ -1,9 +1,9 @@
 package com.example.student.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.student.common.PageResult;
-import com.example.student.common.exception.BusinessException;
 import com.example.student.entity.Student;
 import com.example.student.mapper.GradeMapper;
 import com.example.student.mapper.StudentMapper;
@@ -12,7 +12,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 学生成绩服务实现类
@@ -28,11 +33,8 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     @Override
     public PageResult<Map<String, Object>> getStudentGrades(Long studentId, Map<String, Object> params) {
         // 获取学生成绩列表的实现
-        // 1. 验证学生是否存在
-        Student student = studentMapper.selectById(studentId);
-        if (student == null) {
-            throw new BusinessException("学生不存在");
-        }
+        // 1. 获取真实的学生ID（兼容传入userId的情况）
+        Long realStudentId = getRealStudentId(studentId);
         
         // 2. 处理查询参数
         int pageNum = params.containsKey("pageNum") ? Integer.parseInt(params.get("pageNum").toString()) : 1;
@@ -44,7 +46,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
         // 3. 查询成绩数据
         IPage<Map<String, Object>> page = gradeMapper.selectStudentGrades(
                 new Page<>(pageNum, pageSize),
-                studentId,
+                realStudentId,
                 courseName,
                 semester,
                 status);
@@ -59,31 +61,36 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     @Override
     public Map<String, Object> getStudentGradeStats(Long studentId) {
         // 获取学生成绩统计数据的实现
-        // 1. 验证学生是否存在
-        Student student = studentMapper.selectById(studentId);
-        if (student == null) {
-            throw new BusinessException("学生不存在");
-        }
+        // 1. 获取真实的学生ID（兼容传入userId的情况）
+        Long realStudentId = getRealStudentId(studentId);
         
         // 2. 统计数据初始化
         Map<String, Object> stats = new HashMap<>();
         
         // 3. 查询并计算统计数据
-        Map<String, Object> dbStats = gradeMapper.selectStudentGradeStats(studentId);
+        Map<String, Object> dbStats = gradeMapper.selectStudentGradeStats(realStudentId);
         
-        // 4. 设置统计数据
-        stats.put("totalCourses", dbStats.get("totalCourses"));
-        stats.put("totalCredits", dbStats.get("totalCredits"));
-        stats.put("averageScore", dbStats.get("averageScore"));
-        stats.put("gpa", calculateGPA(Double.parseDouble(dbStats.get("averageScore").toString())));
+        // 4. 设置统计数据（如果没有成绩记录，返回默认值）
+        if (dbStats != null && dbStats.get("averageScore") != null) {
+            stats.put("totalCourses", dbStats.get("totalCourses"));
+            stats.put("totalCredits", dbStats.get("totalCredits"));
+            stats.put("averageScore", dbStats.get("averageScore"));
+            stats.put("gpa", calculateGPA(Double.parseDouble(dbStats.get("averageScore").toString())));
+        } else {
+            // 新学生或暂无成绩，返回默认值
+            stats.put("totalCourses", 0);
+            stats.put("totalCredits", 0.0);
+            stats.put("averageScore", 0.0);
+            stats.put("gpa", 0.0);
+        }
         
         // 5. 获取每学期成绩趋势数据
-        List<Map<String, Object>> semesterStats = gradeMapper.selectStudentSemesterStats(studentId);
-        stats.put("semesterStats", semesterStats);
+        List<Map<String, Object>> semesterStats = gradeMapper.selectStudentSemesterStats(realStudentId);
+        stats.put("semesterStats", semesterStats != null ? semesterStats : new ArrayList<>());
         
         // 6. 获取成绩分布数据
-        List<Map<String, Object>> gradeDistribution = gradeMapper.selectStudentGradeDistribution(studentId);
-        stats.put("gradeDistribution", gradeDistribution);
+        List<Map<String, Object>> gradeDistribution = gradeMapper.selectStudentGradeDistribution(realStudentId);
+        stats.put("gradeDistribution", gradeDistribution != null ? gradeDistribution : new ArrayList<>());
         
         return stats;
     }
@@ -91,27 +98,42 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     @Override
     public Map<String, Object> getStudentInfo(Long studentId) {
         // 获取学生信息的实现
-        // 1. 验证学生是否存在
-        Student student = studentMapper.selectById(studentId);
-        if (student == null) {
-            throw new BusinessException("学生不存在");
-        }
+        // 1. 获取真实的学生ID（兼容传入userId的情况）
+        Long realStudentId = getRealStudentId(studentId);
         
-        // 2. 创建结果对象
+        // 2. 尝试从student表获取学生信息
+        Student student = realStudentId != null ? studentMapper.selectById(realStudentId) : null;
+        
+        // 3. 创建结果对象
         Map<String, Object> studentInfo = new HashMap<>();
         
-        // 3. 设置学生基本信息
-        studentInfo.put("studentId", student.getStudentNo());
-        studentInfo.put("studentName", student.getName());
-        studentInfo.put("className", student.getClassName());
-        studentInfo.put("majorName", student.getMajorName());
-        studentInfo.put("departmentName", student.getDepartmentName());
-        studentInfo.put("admissionYear", student.getAdmissionYear());
-        studentInfo.put("gender", student.getGender());
-        studentInfo.put("idCard", student.getIdCard());
-        studentInfo.put("phone", student.getPhone());
-        studentInfo.put("email", student.getEmail());
-        studentInfo.put("address", student.getAddress());
+        // 4. 设置学生基本信息
+        if (student != null) {
+            studentInfo.put("studentId", student.getStudentNo());
+            studentInfo.put("studentName", student.getName());
+            studentInfo.put("className", student.getClassName());
+            studentInfo.put("majorName", student.getMajorName());
+            studentInfo.put("departmentName", student.getDepartmentName());
+            studentInfo.put("admissionYear", student.getAdmissionYear());
+            studentInfo.put("gender", student.getGender());
+            studentInfo.put("idCard", student.getIdCard());
+            studentInfo.put("phone", student.getPhone());
+            studentInfo.put("email", student.getEmail());
+            studentInfo.put("address", student.getAddress());
+        } else {
+            // 新学生暂无详细信息，返回默认值
+            studentInfo.put("studentId", "");
+            studentInfo.put("studentName", "");
+            studentInfo.put("className", "");
+            studentInfo.put("majorName", "");
+            studentInfo.put("departmentName", "");
+            studentInfo.put("admissionYear", "");
+            studentInfo.put("gender", null);
+            studentInfo.put("idCard", "");
+            studentInfo.put("phone", "");
+            studentInfo.put("email", "");
+            studentInfo.put("address", "");
+        }
         
         return studentInfo;
     }
@@ -123,7 +145,8 @@ public class StudentGradeServiceImpl implements StudentGradeService {
         Map<String, Object> studentInfo = getStudentInfo(studentId);
         
         // 2. 获取学生所有成绩（不分页）
-        List<Map<String, Object>> gradeList = gradeMapper.selectAllStudentGrades(studentId);
+        Long realStudentId = getRealStudentId(studentId);
+        List<Map<String, Object>> gradeList = gradeMapper.selectAllStudentGrades(realStudentId);
         gradeList.forEach(this::processGradeRecord);
         
         // 3. 获取成绩统计数据
@@ -274,11 +297,8 @@ public class StudentGradeServiceImpl implements StudentGradeService {
     @Override
     public PageResult<Map<String, Object>> getStudentCourseSelections(Long studentId, Map<String, Object> params) {
         // 获取学生选课记录的实现
-        // 1. 验证学生是否存在
-        Student student = studentMapper.selectById(studentId);
-        if (student == null) {
-            throw new BusinessException("学生不存在");
-        }
+        // 1. 获取真实的学生ID（兼容传入userId的情况）
+        Long realStudentId = getRealStudentId(studentId);
         
         // 2. 处理查询参数
         int pageNum = params.containsKey("pageNum") ? Integer.parseInt(params.get("pageNum").toString()) : 1;
@@ -290,7 +310,7 @@ public class StudentGradeServiceImpl implements StudentGradeService {
         // 3. 查询选课数据，与成绩查询相比不过滤score为null的记录
         IPage<Map<String, Object>> page = gradeMapper.selectStudentCourseSelections(
                 new Page<>(pageNum, pageSize),
-                studentId,
+                realStudentId,
                 courseName,
                 semester,
                 status);
@@ -301,4 +321,39 @@ public class StudentGradeServiceImpl implements StudentGradeService {
         
         return new PageResult<>(records, page.getTotal());
     }
-} 
+    
+    /**
+     * 获取真实的学生ID
+     * 兼容处理：如果传入的是userId，则通过student表的user_id字段查找真实的student.id
+     * 如果学生记录不存在，返回null（表示新学生暂无详细信息）
+     *
+     * @param studentId 学生ID或用户ID
+     * @return 真实的学生ID，如果不存在则返回null
+     */
+    private Long getRealStudentId(Long studentId) {
+        if (studentId == null) {
+            return null;
+        }
+        
+        // 1. 先尝试直接按student.id查询
+        Student student = studentMapper.selectById(studentId);
+        if (student != null) {
+            return student.getId();
+        }
+        
+        // 2. 如果查不到，尝试按user_id查询（兼容前端传userId的情况）
+        QueryWrapper<Student> wrapper = new QueryWrapper<>();
+        wrapper.eq("user_id", studentId);
+        wrapper.last("LIMIT 1");
+        student = studentMapper.selectOne(wrapper);
+        
+        if (student != null) {
+            return student.getId();
+        }
+        
+        // 3. 如果都查不到，说明是新学生账户，student表中还没有记录
+        // 返回null，让调用方返回空数据而不是报错
+        log.warn("未找到学生记录，studentId/userId: {}", studentId);
+        return null;
+    }
+}

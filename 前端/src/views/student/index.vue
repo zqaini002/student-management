@@ -336,11 +336,11 @@
         class="upload-demo"
         drag
         action="#"
-          :auto-upload="false"
-          :on-change="uploadFile"
+        :auto-upload="false"
+        :on-change="handleFileChange"
         :before-upload="beforeUpload"
         :file-list="importDialog.fileList"
-          :multiple="false"
+        :multiple="false"
       >
           <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
         <div class="el-upload__text">
@@ -875,9 +875,11 @@ const beforeUpload = (file) => {
   return true
 }
 
-// 自定义上传
-const uploadFile = (options) => {
-  importDialog.fileList = [options.file]
+// 文件改变时的钩子
+const handleFileChange = (uploadFile, uploadFiles) => {
+  // Element Plus的on-change回调参数：(uploadFile, uploadFiles)
+  // uploadFile是当前改变的文件，uploadFiles是文件列表
+  importDialog.fileList = uploadFiles
 }
 
 // 确认导入
@@ -888,17 +890,49 @@ const submitImport = () => {
   }
 
   const formData = new FormData()
-  formData.append('file', importDialog.fileList[0])
+  // Element Plus的文件对象中，raw属性是原始文件对象
+  const file = importDialog.fileList[0].raw || importDialog.fileList[0]
+  
+  console.log('准备导入文件:', {
+    name: file.name,
+    size: file.size,
+    type: file.type
+  })
+  
+  if (!file || file.size === 0) {
+    ElMessage.error('文件为空，请选择有效的Excel文件')
+    return
+  }
+  
+  formData.append('file', file)
 
   importStudent(formData)
     .then(res => {
-      ElMessage.success('导入成功')
+      console.log('导入结果:', res)
+      const data = res.data || {}
+      const total = data.total || 0
+      const success = data.success || 0
+      const fail = data.fail || 0
+      
+      if (total === 0) {
+        ElMessage.warning('Excel文件中没有数据')
+      } else if (fail === 0) {
+        ElMessage.success(`导入成功！共导入${success}条数据`)
+      } else {
+        ElMessage.warning(`导入完成！成功${success}条，失败${fail}条`)
+        // 如果有失败数据，可以显示详情
+        if (data.failList && data.failList.length > 0) {
+          console.error('导入失败的数据:', data.failList)
+        }
+      }
+      
       importDialog.visible = false
+      importDialog.fileList = [] // 清空文件列表
       getStudentListData()
     })
     .catch(err => {
       console.error('导入学生信息失败:', err)
-      ElMessage.error('导入学生信息失败')
+      ElMessage.error(err.message || '导入学生信息失败')
     })
 }
 

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -112,5 +113,41 @@ public class GradeController {
     @PreAuthorize("@auth.hasPermi('grade:input')")
     public Result<Boolean> batchSubmitGrades(@RequestBody List<Map<String, Object>> grades) {
         return Result.success(gradeService.batchSubmitGrades(grades));
+    }
+    
+    /**
+     * 导入成绩数据
+     */
+    @Operation(summary = "导入成绩数据")
+    @PostMapping("/import")
+    @PreAuthorize("@auth.hasPermi('grade:input')")
+    public Result<Map<String, Object>> importGrade(@RequestParam("file") MultipartFile file) throws Exception {
+        Map<String, Object> result = gradeService.importGrade(file);
+        return Result.success(result);
+    }
+    
+    /**
+     * 导出成绩数据
+     */
+    @Operation(summary = "导出成绩数据")
+    @GetMapping("/export")
+    @PreAuthorize("@auth.hasPermi('grade:query')")
+    public void exportGrade(
+            @RequestParam Long courseId,
+            @RequestParam String semester,
+            @RequestParam(required = false) Long classId,
+            @RequestParam(required = false) String studentName,
+            HttpServletResponse response) throws IOException {
+        gradeService.exportGrade(courseId, semester, classId, studentName, response);
+    }
+    
+    /**
+     * 下载成绩导入模板
+     */
+    @Operation(summary = "下载成绩导入模板")
+    @GetMapping("/template")
+    @PreAuthorize("@auth.hasPermi('grade:input')")
+    public void downloadGradeTemplate(HttpServletResponse response) throws IOException {
+        gradeService.downloadGradeTemplate(response);
     }
 } 

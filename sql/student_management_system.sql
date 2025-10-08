@@ -11,7 +11,7 @@
  Target Server Version : 80042 (8.0.42)
  File Encoding         : 65001
 
- Date: 05/06/2025 02:21:17
+ Date: 08/10/2025 19:15:41
 */
 
 SET NAMES utf8mb4;
@@ -34,7 +34,7 @@ CREATE TABLE `attendance`  (
   INDEX `idx_course_offering_id`(`course_offering_id` ASC) USING BTREE,
   INDEX `idx_student_id`(`student_id` ASC) USING BTREE,
   INDEX `idx_attendance_date`(`attendance_date` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 66 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考勤表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 68 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考勤表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of attendance
@@ -104,6 +104,8 @@ INSERT INTO `attendance` VALUES (62, 1, 5, '2025-06-04', 1, '', '2025-06-05 00:4
 INSERT INTO `attendance` VALUES (63, 1, 3, '2025-06-04', 0, '', '2025-06-05 00:40:53', '2025-06-05 00:40:53');
 INSERT INTO `attendance` VALUES (64, 1, 2, '2025-06-04', 0, '', '2025-06-05 00:40:53', '2025-06-05 00:40:53');
 INSERT INTO `attendance` VALUES (65, 9, 5, '2025-06-04', 1, '', '2025-06-05 00:41:44', '2025-06-05 00:41:44');
+INSERT INTO `attendance` VALUES (66, 1, 5, '2025-10-08', 4, '1', '2025-10-08 19:10:52', '2025-10-08 19:10:52');
+INSERT INTO `attendance` VALUES (67, 1, 3, '2025-10-08', 1, '2', '2025-10-08 19:10:52', '2025-10-08 19:10:52');
 
 -- ----------------------------
 -- Table structure for class
@@ -127,7 +129,7 @@ CREATE TABLE `class`  (
 -- ----------------------------
 -- Records of class
 -- ----------------------------
-INSERT INTO `class` VALUES (1, '计算机科学2021级1班', 'CS21-1', 1, '2021', 1, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
+INSERT INTO `class` VALUES (1, '计算机科学2021级1班', 'CS21-1', 1, '2021', 6, '2025-05-15 02:59:39', '2025-06-19 02:29:51');
 INSERT INTO `class` VALUES (2, '计算机科学2021级2班', 'CS21-2', 1, '2021', 2, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `class` VALUES (3, '软件工程2021级1班', 'SE21-1', 2, '2021', 3, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `class` VALUES (4, '软件工程2021级2班', 'SE21-2', 2, '2021', 4, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
@@ -161,7 +163,7 @@ CREATE TABLE `course`  (
 -- ----------------------------
 -- Records of course
 -- ----------------------------
-INSERT INTO `course` VALUES (1, '高等数学', 'MATH101', 5.0, 80, 0, 2, '微积分与数学分析基础课程', '2025-05-15 02:59:39', '2025-05-15 02:59:39');
+INSERT INTO `course` VALUES (1, '高等数学', 'MATH101', 5.0, 80, 0, 2, '微积分与数学分析基础课程', '2025-05-15 02:59:39', '2025-06-19 02:20:40');
 INSERT INTO `course` VALUES (2, '线性代数', 'MATH102', 3.0, 48, 0, 2, '线性代数基础理论课程', '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course` VALUES (3, '概率论与数理统计', 'MATH201', 4.0, 64, 0, 2, '概率与统计学的基础理论课程', '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course` VALUES (4, '程序设计基础(Java)', 'CS101', 4.0, 64, 0, 1, 'Java语言程序设计入门课程', '2025-05-15 02:59:39', '2025-05-15 02:59:39');
@@ -245,7 +247,7 @@ CREATE TABLE `course_selection`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_student_course_offering`(`student_id` ASC, `course_offering_id` ASC) USING BTREE,
   INDEX `idx_course_offering_id`(`course_offering_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 42 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '选课表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 43 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '选课表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of course_selection
@@ -256,7 +258,7 @@ INSERT INTO `course_selection` VALUES (3, 1, 4, '2023-09-01 10:10:00', 88.00, 2,
 INSERT INTO `course_selection` VALUES (4, 1, 5, '2023-09-01 10:15:00', 92.50, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course_selection` VALUES (5, 2, 1, '2023-09-01 10:20:00', 78.00, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course_selection` VALUES (6, 2, 2, '2023-09-01 10:25:00', 82.50, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
-INSERT INTO `course_selection` VALUES (7, 2, 4, '2023-09-01 10:30:00', 95.00, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
+INSERT INTO `course_selection` VALUES (7, 2, 4, '2023-09-01 10:30:00', 96.50, 2, '2025-05-15 02:59:39', '2025-10-08 18:36:14');
 INSERT INTO `course_selection` VALUES (8, 2, 6, '2023-09-01 10:35:00', 87.00, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course_selection` VALUES (9, 3, 1, '2023-09-01 10:40:00', 91.00, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course_selection` VALUES (10, 3, 3, '2023-09-01 10:45:00', 86.50, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
@@ -280,7 +282,7 @@ INSERT INTO `course_selection` VALUES (27, 7, 15, '2024-02-26 09:30:00', NULL, 0
 INSERT INTO `course_selection` VALUES (28, 7, 18, '2024-02-26 09:35:00', NULL, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course_selection` VALUES (29, 8, 11, '2024-02-26 09:40:00', NULL, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course_selection` VALUES (30, 8, 13, '2024-02-26 09:45:00', NULL, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
-INSERT INTO `course_selection` VALUES (31, 8, 16, '2024-02-26 09:50:00', NULL, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
+INSERT INTO `course_selection` VALUES (31, 8, 16, '2024-02-26 09:50:00', 89.50, 2, '2025-05-15 02:59:39', '2025-06-05 22:07:05');
 INSERT INTO `course_selection` VALUES (32, 8, 19, '2024-02-26 09:55:00', NULL, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course_selection` VALUES (33, 9, 12, '2024-02-26 10:00:00', NULL, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course_selection` VALUES (34, 9, 14, '2024-02-26 10:05:00', NULL, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
@@ -290,7 +292,8 @@ INSERT INTO `course_selection` VALUES (37, 10, 13, '2024-02-26 10:20:00', NULL, 
 INSERT INTO `course_selection` VALUES (38, 10, 15, '2024-02-26 10:25:00', NULL, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course_selection` VALUES (39, 10, 18, '2024-02-26 10:30:00', NULL, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `course_selection` VALUES (40, 10, 19, '2024-02-26 10:35:00', NULL, 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
-INSERT INTO `course_selection` VALUES (41, 1, 15, '2025-05-15 17:39:26', NULL, 0, '2025-05-15 17:39:26', '2025-05-15 17:39:26');
+INSERT INTO `course_selection` VALUES (41, 1, 15, '2025-05-15 17:39:26', 90.00, 0, '2025-05-15 17:39:26', '2025-06-05 02:37:57');
+INSERT INTO `course_selection` VALUES (42, 1, 13, '2025-06-19 12:04:55', NULL, 0, '2025-06-19 12:04:55', '2025-06-19 12:04:55');
 
 -- ----------------------------
 -- Table structure for department
@@ -331,7 +334,7 @@ CREATE TABLE `major`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_code`(`code` ASC) USING BTREE,
   INDEX `idx_department_id`(`department_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '专业表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '专业表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of major
@@ -405,12 +408,11 @@ CREATE TABLE `student`  (
   UNIQUE INDEX `idx_student_no`(`student_no` ASC) USING BTREE,
   UNIQUE INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
   INDEX `idx_class_id`(`class_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学生表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学生表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of student
 -- ----------------------------
-INSERT INTO `student` VALUES (1, '2021001001', 13, 1, '2021-09-01', NULL, 0, '110101200301010001', '2003-01-01', '北京市海淀区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `student` VALUES (2, '2021001002', 14, 1, '2021-09-01', NULL, 1, '110101200302150002', '2003-02-15', '北京市朝阳区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `student` VALUES (3, '2021001003', 15, 2, '2021-09-01', NULL, 0, '110101200303200003', '2003-03-20', '北京市西城区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `student` VALUES (4, '2021001004', 16, 2, '2021-09-01', NULL, 1, '110101200304250004', '2003-04-25', '北京市东城区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
@@ -430,7 +432,10 @@ INSERT INTO `student` VALUES (17, '2021007001', 29, 9, '2021-09-01', NULL, 0, '1
 INSERT INTO `student` VALUES (18, '2021007002', 30, 9, '2021-09-01', NULL, 1, '110101200306050018', '2003-06-05', '北京市东城区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `student` VALUES (19, '2021009001', 31, 10, '2021-09-01', NULL, 0, '110101200307100019', '2003-07-10', '北京市丰台区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `student` VALUES (20, '2021009002', 32, 10, '2021-09-01', NULL, 1, '110101200308150020', '2003-08-15', '北京市石景山区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
-INSERT INTO `student` VALUES (22, '20324454', 143, 11, '2025-05-12', '2025-05-31', 0, '520135485461254', '2025-05-20', 'student001', 0, '2025-05-17 18:41:46', '2025-05-17 18:41:46');
+INSERT INTO `student` VALUES (22, '20324454', 143, 1, '2025-05-12', '2025-05-31', 0, '520135485461254', '2025-05-20', 'student001', 0, '2025-05-17 18:41:46', '2025-05-17 18:41:46');
+INSERT INTO `student` VALUES (23, '20034243', 147, 2, '2025-09-28', NULL, 0, '520103200495829481', '2025-09-28', '', 0, '2025-09-29 16:05:47', '2025-09-29 16:05:47');
+INSERT INTO `student` VALUES (24, '2034234', 148, 3, '2025-09-22', '2025-09-30', 0, '520393847284738443', '2025-09-30', '', 0, '2025-09-29 18:31:41', '2025-09-29 18:31:41');
+INSERT INTO `student` VALUES (25, 'S202301001', 149, 1, '2023-09-01', '2027-06-30', 0, '110101200301010033', '2003-01-01', '北京市海淀区', 0, '2025-10-08 18:32:27', '2025-10-08 18:32:27');
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -840,14 +845,14 @@ CREATE TABLE `sys_user`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_username`(`username` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 147 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 150 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sys_user
 -- ----------------------------
 INSERT INTO `sys_user` VALUES (1, 'admin', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '管理员', '/uploads/avatar/2025/05/14/022dec4609a14c59b4c2d1ee36eed050.jpg', '1610494022@qq.com', '18745618542', 0, 0, '2025-05-10 23:23:57', '2025-05-14 18:36:04');
 INSERT INTO `sys_user` VALUES (2, 'teacher', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '测试教师', '/uploads/avatar/2025/05/14/edc6a90f3eb44d8aae053aeacb7da204.jpg', 'teacher@example.com', '13800000001', 0, 1, '2025-05-10 23:23:57', '2025-05-14 18:37:03');
-INSERT INTO `sys_user` VALUES (3, 'teacher001', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '张教授', NULL, 'zhang@example.com', '13800138001', 0, 1, '2025-05-15 03:17:12', '2025-05-15 03:19:02');
+INSERT INTO `sys_user` VALUES (3, 'teacher001', '$2a$10$jSsRPHkV3OX5V0g6RkMetO8X/S/gj9rjdsAa0PGczXQLsLeK/ad3u', '张教授1', NULL, 'zhang@example.com', '13800138001', 0, 1, '2025-05-15 03:17:12', '2025-05-15 03:19:02');
 INSERT INTO `sys_user` VALUES (4, 'teacher002', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '李教授', NULL, 'li@example.com', '13800138002', 0, 1, '2025-05-15 03:17:12', '2025-05-15 03:19:04');
 INSERT INTO `sys_user` VALUES (5, 'teacher003', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '王副教授', NULL, 'wang@example.com', '13800138003', 0, 1, '2025-05-15 03:17:12', '2025-05-15 03:19:03');
 INSERT INTO `sys_user` VALUES (6, 'teacher004', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '赵讲师', NULL, 'zhao@example.com', '13800138004', 0, 1, '2025-05-15 03:17:12', '2025-05-15 03:19:05');
@@ -857,7 +862,6 @@ INSERT INTO `sys_user` VALUES (9, 'teacher007', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPg
 INSERT INTO `sys_user` VALUES (10, 'teacher008', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '杨教授', NULL, 'yang@example.com', '13800138008', 0, 1, '2025-05-15 03:17:12', '2025-05-15 03:19:08');
 INSERT INTO `sys_user` VALUES (11, 'teacher009', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '吴副教授', NULL, 'wu@example.com', '13800138009', 0, 1, '2025-05-15 03:17:12', '2025-05-15 03:19:09');
 INSERT INTO `sys_user` VALUES (12, 'teacher010', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '郑讲师', NULL, 'zheng@example.com', '13800138010', 0, 1, '2025-05-15 03:17:12', '2025-05-15 03:19:10');
-INSERT INTO `sys_user` VALUES (13, 'student001', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '张三', '/uploads/avatar/2025/05/15/162c64621ac94c299134f591c9d79509.jpeg', 'zhangsan@example.com', '13900139001', 0, 2, '2025-05-15 03:18:30', '2025-05-15 21:28:39');
 INSERT INTO `sys_user` VALUES (14, 'student002', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '李四', NULL, 'lisi@example.com', '13900139002', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:11');
 INSERT INTO `sys_user` VALUES (15, 'student003', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '王五', NULL, 'wangwu@example.com', '13900139003', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:11');
 INSERT INTO `sys_user` VALUES (16, 'student004', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '赵六', NULL, 'zhaoliu@example.com', '13900139004', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:12');
@@ -872,8 +876,8 @@ INSERT INTO `sys_user` VALUES (24, 'student012', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOP
 INSERT INTO `sys_user` VALUES (25, 'student013', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '钱十五', NULL, 'qian15@example.com', '13900139013', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:18');
 INSERT INTO `sys_user` VALUES (26, 'student014', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '孙十六', NULL, 'sun16@example.com', '13900139014', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:19');
 INSERT INTO `sys_user` VALUES (27, 'student015', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '周十七', NULL, 'zhou17@example.com', '13900139015', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:19');
-INSERT INTO `sys_user` VALUES (30, 'student016', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '吴十八', NULL, 'wu18@example.com', '13900139016', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:20');
-INSERT INTO `sys_user` VALUES (31, 'student017', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '郑十九', NULL, 'zheng19@example.com', '13900139017', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:20');
+INSERT INTO `sys_user` VALUES (30, 'student016', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '吴十八2', NULL, 'wu18@example.com', '13900139016', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:20');
+INSERT INTO `sys_user` VALUES (31, 'student017', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '郑十九0', NULL, 'zheng19@example.com', '13900139017', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:20');
 INSERT INTO `sys_user` VALUES (32, 'student018', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '陈二十', NULL, 'chen20@example.com', '13900139018', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:22');
 INSERT INTO `sys_user` VALUES (33, 'student019', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '林二一', NULL, 'lin21@example.com', '13900139019', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:21');
 INSERT INTO `sys_user` VALUES (34, 'student020', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '黄二二', NULL, 'huang22@example.com', '13900139020', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:22');
@@ -882,6 +886,9 @@ INSERT INTO `sys_user` VALUES (142, 'hahha', '$2a$10$KCled2Mk/IpYJRanAZJH1eNu/uC
 INSERT INTO `sys_user` VALUES (143, '20324454', '$2a$10$4u9AgZAy75zqSd4SJaOi2Oyj4NMvJ7tSadxryN2lcZxmb20g0pbnW', '张力王', NULL, '1610494022@qq.com', '15481654852', 0, 2, '2025-05-17 18:41:46', '2025-05-17 18:41:46');
 INSERT INTO `sys_user` VALUES (144, '203245', '$2a$10$22ykkKeiBNKg5N5AKslF5O6aYdEGGZYOR9fZtn8BPPZukNXaskPZ.', '找那个', NULL, '1610494022@qq.com', '18786079386', 0, 1, '2025-05-17 18:43:32', '2025-05-17 18:43:32');
 INSERT INTO `sys_user` VALUES (146, '00215', '$2a$10$MH.H8GIr1vSWAmPCL2heI.MPRtr.mEW3ipYHeWXyWOZ8Oakbwtw7i', 'zhangsan', NULL, '1610494022@qq.com', '15484484848', 0, 1, '2025-05-17 18:46:50', '2025-05-17 18:46:50');
+INSERT INTO `sys_user` VALUES (147, 'zhangsan', '$2a$10$dLC9jGpD3Zfb.JJvPPReDuRJVWmnRcv4CBh86Tc5g4OsETeSSiP7S', 'zhangsan', NULL, '', '', 0, 2, '2025-09-29 16:05:47', '2025-09-29 16:05:47');
+INSERT INTO `sys_user` VALUES (148, 'lisi', '$2a$10$LzksGKi4ZGne/vZAk20Qf.S5FI3nBz0aYHUcrF1ntvpZyZ5XNTrte', 'lisi', NULL, '', '', 0, 2, '2025-09-29 18:31:41', '2025-09-29 18:31:41');
+INSERT INTO `sys_user` VALUES (149, 'S202301001', '$2a$10$.5cwTaYk9e2VEW4QeZufuO3ujIufWmKPzLLDeTOeBzLTIGYe91cNq', '张五', NULL, 'zhangsan@example.com', '13800000001', 0, 2, '2025-10-08 18:32:27', '2025-10-08 18:32:27');
 
 -- ----------------------------
 -- Table structure for sys_user_role
@@ -932,6 +939,7 @@ INSERT INTO `sys_user_role` VALUES (141, 2);
 INSERT INTO `sys_user_role` VALUES (142, 2);
 INSERT INTO `sys_user_role` VALUES (144, 2);
 INSERT INTO `sys_user_role` VALUES (146, 2);
+INSERT INTO `sys_user_role` VALUES (148, 3);
 
 -- ----------------------------
 -- Table structure for teacher

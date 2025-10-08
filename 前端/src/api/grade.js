@@ -113,3 +113,45 @@ export function getStudentCourseSelections(studentId, params) {
     params
   })
 }
+
+/**
+ * 导入成绩数据
+ * @param {FormData} formData 包含文件的表单数据
+ * @returns 导入结果
+ */
+export function importGrade(formData) {
+  return request({
+    url: '/grade/import',
+    method: 'post',
+    data: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+/**
+ * 导出成绩数据
+ * @param {Object} params 导出参数
+ * @returns 文件流
+ */
+export function exportGrade(params) {
+  return request({
+    url: '/grade/export',
+    method: 'get',
+    params,
+    responseType: 'blob'
+  })
+}
+
+/**
+ * 下载成绩导入模板
+ * @returns 模板文件流
+ */
+export function downloadGradeTemplate() {
+  return request({
+    url: '/grade/template',
+    method: 'get',
+    responseType: 'blob'
+  })
+}
