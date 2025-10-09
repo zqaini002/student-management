@@ -253,7 +253,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         // 1. 如果teacherId为null，视为管理员访问，无需权限检查
         // 2. 如果有teacherId，检查该教师是否有权限操作这个课程
         if (teacherId != null) {
-            int count = teacherMapper.checkTeacherCoursePermission(courseId, teacherId);
+            int count = teacherMapper.checkTeacherCoursePermission(teacherId, courseId);
             if (count == 0) {
                 log.warn("教师 {} 没有权限操作课程 {}", teacherId, courseId);
                 throw new BusinessException("没有权限操作该课程");
@@ -323,7 +323,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
         // 1. 如果teacherId为null，视为管理员访问，无需权限检查
         // 2. 如果有teacherId，检查该教师是否有权限操作这个课程
         if (teacherId != null) {
-            int count = teacherMapper.checkTeacherCoursePermission(courseId, teacherId);
+            int count = teacherMapper.checkTeacherCoursePermission(teacherId, courseId);
             if (count == 0) {
                 log.warn("教师 {} 没有权限操作课程 {}", teacherId, courseId);
                 throw new BusinessException("没有权限操作该课程");

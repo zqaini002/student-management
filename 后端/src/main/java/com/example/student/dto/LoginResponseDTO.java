@@ -35,6 +35,12 @@ public class LoginResponseDTO {
     @Schema(description = "用户类型 0:管理员 1:教师 2:学生")
     private Integer userType;
 
+    @Schema(description = "教师ID")
+    private Long teacherId;
+
+    @Schema(description = "学生ID")
+    private Long studentId;
+
     @Schema(description = "角色列表")
     private List<String> roles;
 

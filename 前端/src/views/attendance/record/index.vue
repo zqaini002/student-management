@@ -408,11 +408,26 @@ async function fetchTeacherId() {
     
     // 判断用户类型和权限
     const isAdmin = userInfo && userInfo.roles && userInfo.roles.some(role => role === 'admin')
+    const isTeacher = userInfo && userInfo.roles && userInfo.roles.some(role => role === 'teacher')
     
     if (userInfo && userInfo.teacherId) {
-      // 教师用户
+      // 教师用户 - 有teacherId
       teacherId.value = userInfo.teacherId
       console.log('教师用户访问考勤页面，teacherId:', teacherId.value)
+    } else if (isTeacher && userInfo.userType === 1) {
+      // 教师用户但缺少teacherId - 这可能是数据问题
+      console.warn('教师用户缺少teacherId，请刷新页面或联系管理员。用户信息:', userInfo)
+      ElMessage.warning('用户信息不完整，请刷新页面后重试')
+      // 尝试重新获取用户信息
+      await userStore.getInfo()
+      const newUserInfo = userStore.userInfo
+      if (newUserInfo && newUserInfo.teacherId) {
+        teacherId.value = newUserInfo.teacherId
+        console.log('重新获取到teacherId:', teacherId.value)
+      } else {
+        console.error('重新获取用户信息后仍然缺少teacherId')
+        ElMessage.error('无法获取教师信息，请联系管理员检查数据')
+      }
     } else if (isAdmin) {
       // 管理员用户 - 不需要特定的teacherId
       console.log('管理员用户访问考勤页面')
@@ -423,7 +438,7 @@ async function fetchTeacherId() {
       teacherId.value = null
     } else {
       console.warn('未知用户类型，缺少必要的角色和ID信息:', userInfo)
-      ElMessage.warning('您可能没有权限访问此页面')
+      ElMessage.warning('您可能没有权限访问此页面，请联系管理员')
     }
   } catch (error) {
     console.error('获取用户信息失败:', error)

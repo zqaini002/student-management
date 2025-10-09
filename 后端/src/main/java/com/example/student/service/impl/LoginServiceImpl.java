@@ -4,8 +4,11 @@ import com.example.student.dto.LoginDTO;
 import com.example.student.dto.LoginResponseDTO;
 import com.example.student.entity.SysMenu;
 import com.example.student.entity.SysUser;
+import com.example.student.entity.Teacher;
 import com.example.student.mapper.SysMenuMapper;
 import com.example.student.mapper.SysUserMapper;
+import com.example.student.mapper.TeacherMapper;
+import com.example.student.mapper.StudentMapper;
 import com.example.student.security.LoginUser;
 import com.example.student.service.LoginService;
 import com.example.student.util.JwtUtil;
@@ -37,6 +40,12 @@ public class LoginServiceImpl implements LoginService {
     private SysMenuMapper sysMenuMapper;
 
     @Resource
+    private TeacherMapper teacherMapper;
+    
+    @Resource
+    private StudentMapper studentMapper;
+
+    @Resource
     private JwtUtil jwtUtil;
 
     @Override
@@ -56,6 +65,28 @@ public class LoginServiceImpl implements LoginService {
         List<String> roles = sysUserMapper.selectRoleKeysByUserId(user.getId());
         List<String> permissions = sysUserMapper.selectPermsByUserId(user.getId());
 
+        // 根据用户类型查询对应的teacherId或studentId
+        Long teacherId = null;
+        Long studentId = null;
+        
+        if (user.getUserType() != null) {
+            if (user.getUserType() == 1) {
+                // 教师用户
+                Teacher teacher = teacherMapper.selectTeacherByUserId(user.getId());
+                System.out.println("login - 查询教师信息 - userId: " + user.getId() + ", username: " + user.getUsername() + ", teacher: " + teacher);
+                if (teacher != null) {
+                    teacherId = teacher.getId();
+                    System.out.println("login - 教师用户 " + user.getUsername() + " 的teacherId: " + teacherId);
+                } else {
+                    System.out.println("login - 警告：教师用户 " + user.getUsername() + " (userId=" + user.getId() + ") 在teacher表中没有对应记录");
+                }
+            } else if (user.getUserType() == 2) {
+                // 学生用户
+                studentId = studentMapper.selectStudentIdByUserId(user.getId());
+                System.out.println("login - 学生用户 " + user.getUsername() + " 的studentId: " + studentId);
+            }
+        }
+
         // 生成JWT令牌
         String token = jwtUtil.generateToken(loginUser);
 
@@ -66,6 +97,8 @@ public class LoginServiceImpl implements LoginService {
                 .name(user.getName())
                 .avatar(user.getAvatar())
                 .userType(user.getUserType())
+                .teacherId(teacherId)
+                .studentId(studentId)
                 .roles(roles)
                 .permissions(permissions)
                 .token(token)
@@ -83,6 +116,28 @@ public class LoginServiceImpl implements LoginService {
         List<String> roles = sysUserMapper.selectRoleKeysByUserId(user.getId());
         List<String> permissions = sysUserMapper.selectPermsByUserId(user.getId());
 
+        // 根据用户类型查询对应的teacherId或studentId
+        Long teacherId = null;
+        Long studentId = null;
+        
+        if (user.getUserType() != null) {
+            if (user.getUserType() == 1) {
+                // 教师用户
+                Teacher teacher = teacherMapper.selectTeacherByUserId(user.getId());
+                System.out.println("getUserInfo - 查询教师信息 - userId: " + user.getId() + ", username: " + user.getUsername() + ", teacher: " + teacher);
+                if (teacher != null) {
+                    teacherId = teacher.getId();
+                    System.out.println("getUserInfo - 教师用户 " + user.getUsername() + " 的teacherId: " + teacherId);
+                } else {
+                    System.out.println("getUserInfo - 警告：教师用户 " + user.getUsername() + " (userId=" + user.getId() + ") 在teacher表中没有对应记录");
+                }
+            } else if (user.getUserType() == 2) {
+                // 学生用户
+                studentId = studentMapper.selectStudentIdByUserId(user.getId());
+                System.out.println("getUserInfo - 学生用户 " + user.getUsername() + " 的studentId: " + studentId);
+            }
+        }
+
         // 构建并返回用户信息
         return LoginResponseDTO.builder()
                 .userId(user.getId())
@@ -90,6 +145,8 @@ public class LoginServiceImpl implements LoginService {
                 .name(user.getName())
                 .avatar(user.getAvatar())
                 .userType(user.getUserType())
+                .teacherId(teacherId)
+                .studentId(studentId)
                 .roles(roles)
                 .permissions(permissions)
                 .build();
