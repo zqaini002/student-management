@@ -572,6 +572,9 @@ const handleImport = (uploadFile) => {
   // 这里需要实现导入功能
   ElMessage.info('课程导入功能开发中')
   importLoading.value = false
+  
+  // 返回 false 阻止 Element Plus 的默认上传行为
+  return false
 }
 
 // 导出课程数据

@@ -515,7 +515,9 @@ function handleWithdraw(row) {
 function confirmWithdraw() {
   if (!currentWithdrawCourse.value) return
   
-  currentStudentWithdrawCourse(currentWithdrawCourse.value.id).then(response => {
+  // 使用 course_offering_id 而不是选课记录 id
+  const courseOfferingId = currentWithdrawCourse.value.course_offering_id || currentWithdrawCourse.value.courseOfferingId
+  currentStudentWithdrawCourse(courseOfferingId).then(response => {
     ElMessage.success('退选成功')
     withdrawConfirmDialogVisible.value = false
     getSelectedCourses()

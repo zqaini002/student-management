@@ -837,15 +837,30 @@ const handleTeacherNoChange = () => {
 const handleImport = (uploadFile) => {
   importLoading.value = true
   
-  importTeacher(uploadFile.raw).then(res => {
-    ElMessage.success('导入成功')
+  importTeacher(uploadFile).then(res => {
+    const result = res.data
+    if (result.failCount > 0) {
+      ElMessageBox.alert(
+        `导入完成！成功：${result.successCount}条，失败：${result.failCount}条<br/>失败原因：<br/>${result.failMessages.join('<br/>')}`,
+        '导入结果',
+        {
+          dangerouslyUseHTMLString: true,
+          type: result.failCount > 0 ? 'warning' : 'success'
+        }
+      )
+    } else {
+      ElMessage.success(`导入成功！共导入${result.successCount}条数据`)
+    }
     getList()
   }).catch(err => {
     console.error('导入失败', err)
-    ElMessage.error('导入失败')
+    ElMessage.error(err.response?.data?.message || '导入失败')
   }).finally(() => {
     importLoading.value = false
   })
+  
+  // 返回 false 阻止 Element Plus 的默认上传行为
+  return false
 }
 
 // 导出教师数据
