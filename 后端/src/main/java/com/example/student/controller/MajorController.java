@@ -45,15 +45,15 @@ public class MajorController {
     @GetMapping("/list")
     @PreAuthorize("hasAuthority('education:major:list')")
     public Result<Page<MajorVO>> getMajorList(
-            @RequestParam(defaultValue = "1") Integer current,
-            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String code,
             @RequestParam(required = false) Long departmentId) {
-        log.info("查询专业列表，参数：current={}, size={}, name={}, code={}, departmentId={}", 
-                current, size, name, code, departmentId);
+        log.info("查询专业列表，参数：pageNum={}, pageSize={}, name={}, code={}, departmentId={}",
+                pageNum, pageSize, name, code, departmentId);
         try {
-            Page<Major> page = new Page<>(current, size);
+            Page<Major> page = new Page<>(pageNum, pageSize);
             
             // 构建查询条件
             Major queryMajor = new Major();
