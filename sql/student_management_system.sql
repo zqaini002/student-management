@@ -11,7 +11,7 @@
  Target Server Version : 80042 (8.0.42)
  File Encoding         : 65001
 
- Date: 08/10/2025 19:15:41
+ Date: 31/10/2025 23:31:17
 */
 
 SET NAMES utf8mb4;
@@ -33,7 +33,9 @@ CREATE TABLE `attendance`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_course_offering_id`(`course_offering_id` ASC) USING BTREE,
   INDEX `idx_student_id`(`student_id` ASC) USING BTREE,
-  INDEX `idx_attendance_date`(`attendance_date` ASC) USING BTREE
+  INDEX `idx_attendance_date`(`attendance_date` ASC) USING BTREE,
+  CONSTRAINT `fk_attendance_offering` FOREIGN KEY (`course_offering_id`) REFERENCES `course_offering` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_attendance_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 68 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考勤表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -123,7 +125,9 @@ CREATE TABLE `class`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_code`(`code` ASC) USING BTREE,
   INDEX `idx_major_id`(`major_id` ASC) USING BTREE,
-  INDEX `idx_advisor_id`(`advisor_id` ASC) USING BTREE
+  INDEX `idx_advisor_id`(`advisor_id` ASC) USING BTREE,
+  CONSTRAINT `fk_class_advisor` FOREIGN KEY (`advisor_id`) REFERENCES `teacher` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_class_major` FOREIGN KEY (`major_id`) REFERENCES `major` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '班级表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -157,7 +161,8 @@ CREATE TABLE `course`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_code`(`code` ASC) USING BTREE,
-  INDEX `idx_department_id`(`department_id` ASC) USING BTREE
+  INDEX `idx_department_id`(`department_id` ASC) USING BTREE,
+  CONSTRAINT `fk_course_department` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -204,7 +209,9 @@ CREATE TABLE `course_offering`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_course_id`(`course_id` ASC) USING BTREE,
   INDEX `idx_teacher_id`(`teacher_id` ASC) USING BTREE,
-  INDEX `idx_semester`(`semester` ASC) USING BTREE
+  INDEX `idx_semester`(`semester` ASC) USING BTREE,
+  CONSTRAINT `fk_offering_course` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_offering_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程开设表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -246,7 +253,9 @@ CREATE TABLE `course_selection`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_student_course_offering`(`student_id` ASC, `course_offering_id` ASC) USING BTREE,
-  INDEX `idx_course_offering_id`(`course_offering_id` ASC) USING BTREE
+  INDEX `idx_course_offering_id`(`course_offering_id` ASC) USING BTREE,
+  CONSTRAINT `fk_selection_offering` FOREIGN KEY (`course_offering_id`) REFERENCES `course_offering` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_selection_student` FOREIGN KEY (`student_id`) REFERENCES `student` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 43 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '选课表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -318,6 +327,7 @@ INSERT INTO `department` VALUES (2, '数学与统计学院', 'MATH', '专注于�
 INSERT INTO `department` VALUES (3, '外国语学院', 'FL', '专注于外国语言文学的教学和研究', '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `department` VALUES (4, '经济管理学院', 'EM', '专注于经济学和管理学的教学和研究', '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `department` VALUES (5, '物理与电子工程学院', 'PE', '专注于物理学和电子工程的教学和研究', '2025-05-15 02:59:39', '2025-05-15 02:59:39');
+INSERT INTO `department` VALUES (6, '院系6', 'DEPT6', '自动创建的院系6', '2025-10-15 22:21:33', '2025-10-15 22:21:33');
 
 -- ----------------------------
 -- Table structure for major
@@ -333,7 +343,8 @@ CREATE TABLE `major`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_code`(`code` ASC) USING BTREE,
-  INDEX `idx_department_id`(`department_id` ASC) USING BTREE
+  INDEX `idx_department_id`(`department_id` ASC) USING BTREE,
+  CONSTRAINT `fk_major_department` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '专业表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -369,7 +380,8 @@ CREATE TABLE `notice`  (
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_publisher_id`(`publisher_id` ASC) USING BTREE,
-  INDEX `idx_publish_time`(`publish_time` ASC) USING BTREE
+  INDEX `idx_publish_time`(`publish_time` ASC) USING BTREE,
+  CONSTRAINT `fk_notice_publisher` FOREIGN KEY (`publisher_id`) REFERENCES `sys_user` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统公告表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -407,12 +419,15 @@ CREATE TABLE `student`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_student_no`(`student_no` ASC) USING BTREE,
   UNIQUE INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
-  INDEX `idx_class_id`(`class_id` ASC) USING BTREE
+  INDEX `idx_class_id`(`class_id` ASC) USING BTREE,
+  CONSTRAINT `fk_student_class` FOREIGN KEY (`class_id`) REFERENCES `class` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_student_user` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学生表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of student
 -- ----------------------------
+INSERT INTO `student` VALUES (1, '2021001001', 13, 1, '2021-09-01', NULL, 0, '110101200301100001', '2003-01-10', '北京市海淀区', 0, '2025-10-15 22:21:47', '2025-10-15 22:21:47');
 INSERT INTO `student` VALUES (2, '2021001002', 14, 1, '2021-09-01', NULL, 1, '110101200302150002', '2003-02-15', '北京市朝阳区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `student` VALUES (3, '2021001003', 15, 2, '2021-09-01', NULL, 0, '110101200303200003', '2003-03-20', '北京市西城区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
 INSERT INTO `student` VALUES (4, '2021001004', 16, 2, '2021-09-01', NULL, 1, '110101200304250004', '2003-04-25', '北京市东城区', 0, '2025-05-15 02:59:39', '2025-05-15 02:59:39');
@@ -631,7 +646,10 @@ DROP TABLE IF EXISTS `sys_role_menu`;
 CREATE TABLE `sys_role_menu`  (
   `role_id` bigint NOT NULL COMMENT '角色ID',
   `menu_id` bigint NOT NULL COMMENT '菜单ID',
-  PRIMARY KEY (`role_id`, `menu_id`) USING BTREE
+  PRIMARY KEY (`role_id`, `menu_id`) USING BTREE,
+  INDEX `fk_role_menu_menu`(`menu_id` ASC) USING BTREE,
+  CONSTRAINT `fk_role_menu_menu` FOREIGN KEY (`menu_id`) REFERENCES `sys_menu` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_role_menu_role` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色和菜单关联表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -640,38 +658,69 @@ CREATE TABLE `sys_role_menu`  (
 INSERT INTO `sys_role_menu` VALUES (1, 1);
 INSERT INTO `sys_role_menu` VALUES (1, 2);
 INSERT INTO `sys_role_menu` VALUES (1, 3);
+INSERT INTO `sys_role_menu` VALUES (2, 3);
 INSERT INTO `sys_role_menu` VALUES (1, 4);
+INSERT INTO `sys_role_menu` VALUES (2, 4);
 INSERT INTO `sys_role_menu` VALUES (1, 5);
 INSERT INTO `sys_role_menu` VALUES (1, 6);
 INSERT INTO `sys_role_menu` VALUES (1, 7);
+INSERT INTO `sys_role_menu` VALUES (2, 7);
 INSERT INTO `sys_role_menu` VALUES (1, 8);
+INSERT INTO `sys_role_menu` VALUES (2, 8);
+INSERT INTO `sys_role_menu` VALUES (3, 10);
 INSERT INTO `sys_role_menu` VALUES (1, 100);
 INSERT INTO `sys_role_menu` VALUES (1, 101);
 INSERT INTO `sys_role_menu` VALUES (1, 102);
 INSERT INTO `sys_role_menu` VALUES (1, 103);
 INSERT INTO `sys_role_menu` VALUES (1, 104);
 INSERT INTO `sys_role_menu` VALUES (1, 200);
+INSERT INTO `sys_role_menu` VALUES (2, 200);
 INSERT INTO `sys_role_menu` VALUES (1, 201);
 INSERT INTO `sys_role_menu` VALUES (1, 202);
 INSERT INTO `sys_role_menu` VALUES (1, 300);
+INSERT INTO `sys_role_menu` VALUES (2, 300);
 INSERT INTO `sys_role_menu` VALUES (1, 301);
 INSERT INTO `sys_role_menu` VALUES (1, 400);
+INSERT INTO `sys_role_menu` VALUES (2, 400);
 INSERT INTO `sys_role_menu` VALUES (1, 401);
 INSERT INTO `sys_role_menu` VALUES (1, 500);
+INSERT INTO `sys_role_menu` VALUES (2, 500);
 INSERT INTO `sys_role_menu` VALUES (1, 501);
 INSERT INTO `sys_role_menu` VALUES (1, 502);
+INSERT INTO `sys_role_menu` VALUES (2, 502);
 INSERT INTO `sys_role_menu` VALUES (1, 600);
+INSERT INTO `sys_role_menu` VALUES (2, 600);
 INSERT INTO `sys_role_menu` VALUES (1, 601);
+INSERT INTO `sys_role_menu` VALUES (2, 601);
+INSERT INTO `sys_role_menu` VALUES (3, 650);
+INSERT INTO `sys_role_menu` VALUES (3, 651);
 INSERT INTO `sys_role_menu` VALUES (1, 700);
+INSERT INTO `sys_role_menu` VALUES (2, 700);
 INSERT INTO `sys_role_menu` VALUES (1, 701);
+INSERT INTO `sys_role_menu` VALUES (2, 701);
+INSERT INTO `sys_role_menu` VALUES (3, 750);
 INSERT INTO `sys_role_menu` VALUES (1, 800);
+INSERT INTO `sys_role_menu` VALUES (2, 800);
 INSERT INTO `sys_role_menu` VALUES (1, 801);
+INSERT INTO `sys_role_menu` VALUES (2, 801);
 INSERT INTO `sys_role_menu` VALUES (1, 802);
+INSERT INTO `sys_role_menu` VALUES (2, 802);
+INSERT INTO `sys_role_menu` VALUES (3, 850);
 INSERT INTO `sys_role_menu` VALUES (1, 900);
+INSERT INTO `sys_role_menu` VALUES (2, 900);
+INSERT INTO `sys_role_menu` VALUES (3, 900);
 INSERT INTO `sys_role_menu` VALUES (1, 910);
+INSERT INTO `sys_role_menu` VALUES (2, 910);
+INSERT INTO `sys_role_menu` VALUES (3, 910);
 INSERT INTO `sys_role_menu` VALUES (1, 911);
+INSERT INTO `sys_role_menu` VALUES (2, 911);
+INSERT INTO `sys_role_menu` VALUES (3, 911);
 INSERT INTO `sys_role_menu` VALUES (1, 912);
+INSERT INTO `sys_role_menu` VALUES (2, 912);
+INSERT INTO `sys_role_menu` VALUES (3, 912);
 INSERT INTO `sys_role_menu` VALUES (1, 950);
+INSERT INTO `sys_role_menu` VALUES (2, 950);
+INSERT INTO `sys_role_menu` VALUES (3, 950);
 INSERT INTO `sys_role_menu` VALUES (1, 1001);
 INSERT INTO `sys_role_menu` VALUES (1, 1002);
 INSERT INTO `sys_role_menu` VALUES (1, 1003);
@@ -697,6 +746,7 @@ INSERT INTO `sys_role_menu` VALUES (1, 1042);
 INSERT INTO `sys_role_menu` VALUES (1, 1043);
 INSERT INTO `sys_role_menu` VALUES (1, 1044);
 INSERT INTO `sys_role_menu` VALUES (1, 2001);
+INSERT INTO `sys_role_menu` VALUES (2, 2001);
 INSERT INTO `sys_role_menu` VALUES (1, 2002);
 INSERT INTO `sys_role_menu` VALUES (1, 2003);
 INSERT INTO `sys_role_menu` VALUES (1, 2004);
@@ -712,6 +762,7 @@ INSERT INTO `sys_role_menu` VALUES (1, 2023);
 INSERT INTO `sys_role_menu` VALUES (1, 2024);
 INSERT INTO `sys_role_menu` VALUES (1, 2025);
 INSERT INTO `sys_role_menu` VALUES (1, 3001);
+INSERT INTO `sys_role_menu` VALUES (2, 3001);
 INSERT INTO `sys_role_menu` VALUES (1, 3002);
 INSERT INTO `sys_role_menu` VALUES (1, 3003);
 INSERT INTO `sys_role_menu` VALUES (1, 3004);
@@ -720,6 +771,7 @@ INSERT INTO `sys_role_menu` VALUES (1, 3006);
 INSERT INTO `sys_role_menu` VALUES (1, 3007);
 INSERT INTO `sys_role_menu` VALUES (1, 3011);
 INSERT INTO `sys_role_menu` VALUES (1, 4001);
+INSERT INTO `sys_role_menu` VALUES (2, 4001);
 INSERT INTO `sys_role_menu` VALUES (1, 4002);
 INSERT INTO `sys_role_menu` VALUES (1, 4003);
 INSERT INTO `sys_role_menu` VALUES (1, 4004);
@@ -728,103 +780,65 @@ INSERT INTO `sys_role_menu` VALUES (1, 4006);
 INSERT INTO `sys_role_menu` VALUES (1, 4007);
 INSERT INTO `sys_role_menu` VALUES (1, 4011);
 INSERT INTO `sys_role_menu` VALUES (1, 5001);
+INSERT INTO `sys_role_menu` VALUES (2, 5001);
 INSERT INTO `sys_role_menu` VALUES (1, 5002);
 INSERT INTO `sys_role_menu` VALUES (1, 5003);
 INSERT INTO `sys_role_menu` VALUES (1, 5004);
 INSERT INTO `sys_role_menu` VALUES (1, 5005);
 INSERT INTO `sys_role_menu` VALUES (1, 5011);
 INSERT INTO `sys_role_menu` VALUES (1, 5021);
+INSERT INTO `sys_role_menu` VALUES (2, 5021);
 INSERT INTO `sys_role_menu` VALUES (1, 5022);
 INSERT INTO `sys_role_menu` VALUES (1, 5023);
 INSERT INTO `sys_role_menu` VALUES (1, 5024);
 INSERT INTO `sys_role_menu` VALUES (1, 6001);
+INSERT INTO `sys_role_menu` VALUES (2, 6001);
 INSERT INTO `sys_role_menu` VALUES (1, 6002);
+INSERT INTO `sys_role_menu` VALUES (2, 6002);
 INSERT INTO `sys_role_menu` VALUES (1, 6003);
 INSERT INTO `sys_role_menu` VALUES (1, 6004);
 INSERT INTO `sys_role_menu` VALUES (1, 6011);
-INSERT INTO `sys_role_menu` VALUES (1, 7001);
-INSERT INTO `sys_role_menu` VALUES (1, 7002);
-INSERT INTO `sys_role_menu` VALUES (1, 7003);
-INSERT INTO `sys_role_menu` VALUES (1, 7004);
-INSERT INTO `sys_role_menu` VALUES (1, 7005);
-INSERT INTO `sys_role_menu` VALUES (1, 7011);
-INSERT INTO `sys_role_menu` VALUES (1, 8001);
-INSERT INTO `sys_role_menu` VALUES (1, 8011);
-INSERT INTO `sys_role_menu` VALUES (1, 8021);
-INSERT INTO `sys_role_menu` VALUES (1, 8022);
-INSERT INTO `sys_role_menu` VALUES (1, 9001);
-INSERT INTO `sys_role_menu` VALUES (1, 9002);
-INSERT INTO `sys_role_menu` VALUES (1, 9003);
-INSERT INTO `sys_role_menu` VALUES (1, 9501);
-INSERT INTO `sys_role_menu` VALUES (1, 9502);
-INSERT INTO `sys_role_menu` VALUES (1, 9503);
-INSERT INTO `sys_role_menu` VALUES (2, 3);
-INSERT INTO `sys_role_menu` VALUES (2, 4);
-INSERT INTO `sys_role_menu` VALUES (2, 7);
-INSERT INTO `sys_role_menu` VALUES (2, 8);
-INSERT INTO `sys_role_menu` VALUES (2, 200);
-INSERT INTO `sys_role_menu` VALUES (2, 204);
-INSERT INTO `sys_role_menu` VALUES (2, 205);
-INSERT INTO `sys_role_menu` VALUES (2, 300);
-INSERT INTO `sys_role_menu` VALUES (2, 400);
-INSERT INTO `sys_role_menu` VALUES (2, 500);
-INSERT INTO `sys_role_menu` VALUES (2, 502);
-INSERT INTO `sys_role_menu` VALUES (2, 600);
-INSERT INTO `sys_role_menu` VALUES (2, 601);
-INSERT INTO `sys_role_menu` VALUES (2, 700);
-INSERT INTO `sys_role_menu` VALUES (2, 701);
-INSERT INTO `sys_role_menu` VALUES (2, 800);
-INSERT INTO `sys_role_menu` VALUES (2, 801);
-INSERT INTO `sys_role_menu` VALUES (2, 802);
-INSERT INTO `sys_role_menu` VALUES (2, 900);
-INSERT INTO `sys_role_menu` VALUES (2, 910);
-INSERT INTO `sys_role_menu` VALUES (2, 911);
-INSERT INTO `sys_role_menu` VALUES (2, 912);
-INSERT INTO `sys_role_menu` VALUES (2, 950);
-INSERT INTO `sys_role_menu` VALUES (2, 2001);
-INSERT INTO `sys_role_menu` VALUES (2, 2041);
-INSERT INTO `sys_role_menu` VALUES (2, 2051);
-INSERT INTO `sys_role_menu` VALUES (2, 3001);
-INSERT INTO `sys_role_menu` VALUES (2, 4001);
-INSERT INTO `sys_role_menu` VALUES (2, 5001);
-INSERT INTO `sys_role_menu` VALUES (2, 5021);
-INSERT INTO `sys_role_menu` VALUES (2, 6001);
-INSERT INTO `sys_role_menu` VALUES (2, 6002);
 INSERT INTO `sys_role_menu` VALUES (2, 6011);
-INSERT INTO `sys_role_menu` VALUES (2, 7001);
-INSERT INTO `sys_role_menu` VALUES (2, 7002);
-INSERT INTO `sys_role_menu` VALUES (2, 7003);
-INSERT INTO `sys_role_menu` VALUES (2, 7011);
-INSERT INTO `sys_role_menu` VALUES (2, 8001);
-INSERT INTO `sys_role_menu` VALUES (2, 8011);
-INSERT INTO `sys_role_menu` VALUES (2, 8021);
-INSERT INTO `sys_role_menu` VALUES (2, 9001);
-INSERT INTO `sys_role_menu` VALUES (2, 9002);
-INSERT INTO `sys_role_menu` VALUES (2, 9501);
-INSERT INTO `sys_role_menu` VALUES (2, 9502);
-INSERT INTO `sys_role_menu` VALUES (2, 9503);
-INSERT INTO `sys_role_menu` VALUES (3, 10);
-INSERT INTO `sys_role_menu` VALUES (3, 650);
-INSERT INTO `sys_role_menu` VALUES (3, 651);
-INSERT INTO `sys_role_menu` VALUES (3, 750);
-INSERT INTO `sys_role_menu` VALUES (3, 850);
-INSERT INTO `sys_role_menu` VALUES (3, 900);
-INSERT INTO `sys_role_menu` VALUES (3, 910);
-INSERT INTO `sys_role_menu` VALUES (3, 911);
-INSERT INTO `sys_role_menu` VALUES (3, 912);
-INSERT INTO `sys_role_menu` VALUES (3, 950);
 INSERT INTO `sys_role_menu` VALUES (3, 6501);
 INSERT INTO `sys_role_menu` VALUES (3, 6502);
 INSERT INTO `sys_role_menu` VALUES (3, 6511);
 INSERT INTO `sys_role_menu` VALUES (3, 6512);
 INSERT INTO `sys_role_menu` VALUES (3, 6513);
 INSERT INTO `sys_role_menu` VALUES (3, 6514);
+INSERT INTO `sys_role_menu` VALUES (1, 7001);
+INSERT INTO `sys_role_menu` VALUES (2, 7001);
+INSERT INTO `sys_role_menu` VALUES (1, 7002);
+INSERT INTO `sys_role_menu` VALUES (2, 7002);
+INSERT INTO `sys_role_menu` VALUES (1, 7003);
+INSERT INTO `sys_role_menu` VALUES (2, 7003);
+INSERT INTO `sys_role_menu` VALUES (1, 7004);
+INSERT INTO `sys_role_menu` VALUES (1, 7005);
+INSERT INTO `sys_role_menu` VALUES (1, 7011);
+INSERT INTO `sys_role_menu` VALUES (2, 7011);
+INSERT INTO `sys_role_menu` VALUES (1, 8001);
+INSERT INTO `sys_role_menu` VALUES (2, 8001);
+INSERT INTO `sys_role_menu` VALUES (1, 8011);
+INSERT INTO `sys_role_menu` VALUES (2, 8011);
+INSERT INTO `sys_role_menu` VALUES (1, 8021);
+INSERT INTO `sys_role_menu` VALUES (2, 8021);
+INSERT INTO `sys_role_menu` VALUES (1, 8022);
 INSERT INTO `sys_role_menu` VALUES (3, 8501);
 INSERT INTO `sys_role_menu` VALUES (3, 8502);
 INSERT INTO `sys_role_menu` VALUES (3, 8503);
+INSERT INTO `sys_role_menu` VALUES (1, 9001);
+INSERT INTO `sys_role_menu` VALUES (2, 9001);
 INSERT INTO `sys_role_menu` VALUES (3, 9001);
+INSERT INTO `sys_role_menu` VALUES (1, 9002);
+INSERT INTO `sys_role_menu` VALUES (2, 9002);
+INSERT INTO `sys_role_menu` VALUES (1, 9003);
+INSERT INTO `sys_role_menu` VALUES (1, 9501);
+INSERT INTO `sys_role_menu` VALUES (2, 9501);
 INSERT INTO `sys_role_menu` VALUES (3, 9501);
+INSERT INTO `sys_role_menu` VALUES (1, 9502);
+INSERT INTO `sys_role_menu` VALUES (2, 9502);
 INSERT INTO `sys_role_menu` VALUES (3, 9502);
+INSERT INTO `sys_role_menu` VALUES (1, 9503);
+INSERT INTO `sys_role_menu` VALUES (2, 9503);
 INSERT INTO `sys_role_menu` VALUES (3, 9503);
 
 -- ----------------------------
@@ -862,6 +876,7 @@ INSERT INTO `sys_user` VALUES (9, 'teacher007', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPg
 INSERT INTO `sys_user` VALUES (10, 'teacher008', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '杨教授', NULL, 'yang@example.com', '13800138008', 0, 1, '2025-05-15 03:17:12', '2025-05-15 03:19:08');
 INSERT INTO `sys_user` VALUES (11, 'teacher009', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '吴副教授', NULL, 'wu@example.com', '13800138009', 0, 1, '2025-05-15 03:17:12', '2025-05-15 03:19:09');
 INSERT INTO `sys_user` VALUES (12, 'teacher010', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '郑讲师', NULL, 'zheng@example.com', '13800138010', 0, 1, '2025-05-15 03:17:12', '2025-05-15 03:19:10');
+INSERT INTO `sys_user` VALUES (13, 'student001', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '张三', NULL, 'zhangsan001@example.com', '13900139001', 0, 2, '2025-10-15 22:21:47', '2025-10-15 22:21:47');
 INSERT INTO `sys_user` VALUES (14, 'student002', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '李四', NULL, 'lisi@example.com', '13900139002', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:11');
 INSERT INTO `sys_user` VALUES (15, 'student003', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '王五', NULL, 'wangwu@example.com', '13900139003', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:11');
 INSERT INTO `sys_user` VALUES (16, 'student004', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '赵六', NULL, 'zhaoliu@example.com', '13900139004', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:12');
@@ -876,6 +891,8 @@ INSERT INTO `sys_user` VALUES (24, 'student012', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOP
 INSERT INTO `sys_user` VALUES (25, 'student013', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '钱十五', NULL, 'qian15@example.com', '13900139013', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:18');
 INSERT INTO `sys_user` VALUES (26, 'student014', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '孙十六', NULL, 'sun16@example.com', '13900139014', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:19');
 INSERT INTO `sys_user` VALUES (27, 'student015', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '周十七', NULL, 'zhou17@example.com', '13900139015', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:19');
+INSERT INTO `sys_user` VALUES (28, 'user_28', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '用户28', NULL, 'user28@example.com', '13900000028', 0, 2, '2025-10-15 22:21:33', '2025-10-15 22:21:33');
+INSERT INTO `sys_user` VALUES (29, 'user_29', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '用户29', NULL, 'user29@example.com', '13900000029', 0, 2, '2025-10-15 22:21:33', '2025-10-15 22:21:33');
 INSERT INTO `sys_user` VALUES (30, 'student016', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '吴十八2', NULL, 'wu18@example.com', '13900139016', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:20');
 INSERT INTO `sys_user` VALUES (31, 'student017', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '郑十九0', NULL, 'zheng19@example.com', '13900139017', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:20');
 INSERT INTO `sys_user` VALUES (32, 'student018', '$2a$10$JJtFy15D9xQm4Sg.Mx43xOPgl6Q4L15krdpRMJXMDww6pvEvEfpym', '陈二十', NULL, 'chen20@example.com', '13900139018', 0, 2, '2025-05-15 03:18:30', '2025-05-15 03:19:22');
@@ -897,7 +914,10 @@ DROP TABLE IF EXISTS `sys_user_role`;
 CREATE TABLE `sys_user_role`  (
   `user_id` bigint NOT NULL COMMENT '用户ID',
   `role_id` bigint NOT NULL COMMENT '角色ID',
-  PRIMARY KEY (`user_id`, `role_id`) USING BTREE
+  PRIMARY KEY (`user_id`, `role_id`) USING BTREE,
+  INDEX `fk_user_role_role`(`role_id` ASC) USING BTREE,
+  CONSTRAINT `fk_user_role_role` FOREIGN KEY (`role_id`) REFERENCES `sys_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_user_role_user` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户和角色关联表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -915,6 +935,10 @@ INSERT INTO `sys_user_role` VALUES (9, 2);
 INSERT INTO `sys_user_role` VALUES (10, 2);
 INSERT INTO `sys_user_role` VALUES (11, 2);
 INSERT INTO `sys_user_role` VALUES (12, 2);
+INSERT INTO `sys_user_role` VALUES (141, 2);
+INSERT INTO `sys_user_role` VALUES (142, 2);
+INSERT INTO `sys_user_role` VALUES (144, 2);
+INSERT INTO `sys_user_role` VALUES (146, 2);
 INSERT INTO `sys_user_role` VALUES (13, 3);
 INSERT INTO `sys_user_role` VALUES (14, 3);
 INSERT INTO `sys_user_role` VALUES (15, 3);
@@ -935,11 +959,10 @@ INSERT INTO `sys_user_role` VALUES (29, 3);
 INSERT INTO `sys_user_role` VALUES (30, 3);
 INSERT INTO `sys_user_role` VALUES (31, 3);
 INSERT INTO `sys_user_role` VALUES (32, 3);
-INSERT INTO `sys_user_role` VALUES (141, 2);
-INSERT INTO `sys_user_role` VALUES (142, 2);
-INSERT INTO `sys_user_role` VALUES (144, 2);
-INSERT INTO `sys_user_role` VALUES (146, 2);
+INSERT INTO `sys_user_role` VALUES (143, 3);
+INSERT INTO `sys_user_role` VALUES (147, 3);
 INSERT INTO `sys_user_role` VALUES (148, 3);
+INSERT INTO `sys_user_role` VALUES (149, 3);
 
 -- ----------------------------
 -- Table structure for teacher
@@ -961,7 +984,9 @@ CREATE TABLE `teacher`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_teacher_no`(`teacher_no` ASC) USING BTREE,
   UNIQUE INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
-  INDEX `idx_department_id`(`department_id` ASC) USING BTREE
+  INDEX `idx_department_id`(`department_id` ASC) USING BTREE,
+  CONSTRAINT `fk_teacher_department` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_teacher_user` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '教师表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -997,7 +1022,8 @@ CREATE TABLE `todo_item`  (
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_user_id`(`user_id` ASC) USING BTREE
+  INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_todo_user` FOREIGN KEY (`user_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '待办事项表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
